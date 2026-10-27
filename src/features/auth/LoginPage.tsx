@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { getPosBridge } from '../bridge';
+import { useAuth } from '../../shared/context/AuthContext';
+import { getPosBridge } from '../../bridge';
 
 const MODES = [
   'Standalone Point of Sale',

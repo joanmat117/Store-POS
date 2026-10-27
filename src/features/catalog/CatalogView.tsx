@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { api, Category, Product, getUploadsBase } from '../api/client';
-import PhotoPicker from '../components/PhotoPicker';
+import { api, Category, Product, getUploadsBase } from '../../shared/api/client';
+import PhotoPicker from '../../shared/components/PhotoPicker';
 
 type Props = {
   products: Product[];

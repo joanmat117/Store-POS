@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "frontend-architecture",
+  "owner": "manutej",
+  "repo": "luxor-claude-marketplace",
+  "path": "plugins/luxor-frontend-essentials/skills/frontend-architecture",
+  "branch": "main",
+  "sha": "17d7c734efdd06c877fdd98d19cfab86e25be0aa",
+  "source": "manual"
+}

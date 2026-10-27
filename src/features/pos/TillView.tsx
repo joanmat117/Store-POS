@@ -8,11 +8,11 @@ import {
   Settings,
   Transaction,
   getUploadsBase,
-} from '../api/client';
-import { useAuth } from '../context/AuthContext';
-import Modal from '../components/Modal';
-import PaymentPad from '../components/PaymentPad';
-import CustomerSelect from '../components/CustomerSelect';
+} from '../../shared/api/client';
+import { useAuth } from '../../shared/context/AuthContext';
+import Modal from '../../shared/components/Modal';
+import PaymentPad from '../../shared/components/PaymentPad';
+import CustomerSelect from '../../shared/components/CustomerSelect';
 
 type Props = {
   products: Product[];

@@ -9,9 +9,9 @@ import {
   User,
   healthCheck,
 } from '../api/client';
-import type { ApiInfo } from '../vite-env';
-import { getPosBridge } from '../bridge';
-import { logger } from '../shared/logger';
+import type { ApiInfo } from '../../vite-env';
+import { getPosBridge } from '../../bridge';
+import { logger } from '../logger';
 
 type AuthState = {
   ready: boolean;

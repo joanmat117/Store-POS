@@ -27,8 +27,8 @@
 ## Important
 
 ### 3. Centralize Port Configuration
-- [ ] Create `config/constants.ts` with `API_PORT = 8001`
-- [ ] Replace hardcoded `8001` in:
+- [x] Create `config/constants.ts` with `API_PORT = 8001`
+- [x] Replace hardcoded `8001` in:
   - `electron/main.js` (line 11)
   - `src/bridge.ts` (line 3)
   - `server/standalone.js` (line 4)
@@ -38,9 +38,9 @@
 **Why:** Single source of truth prevents mismatched ports across processes.
 
 ### 4. Extract Inline Components
-- [ ] Move `CustomersView` / `CustomersPanel` from `PosPage.tsx` → `src/pages/CustomersView.tsx`
-- [ ] Move `TeamView` / `UsersPanel` from `PosPage.tsx` → `src/pages/TeamView.tsx`
-- [ ] Update imports in `PosPage.tsx`
+- [x] Move `CustomersView` / `CustomersPanel` from `PosPage.tsx` → `src/pages/CustomersView.tsx`
+- [x] Move `TeamView` / `UsersPanel` from `PosPage.tsx` → `src/pages/TeamView.tsx`
+- [x] Update imports in `PosPage.tsx`
 **Why:** Improves readability, enables reuse, and simplifies testing.
 
 ### 5. Reorganize Frontend Folder Structure (Screaming Architecture)

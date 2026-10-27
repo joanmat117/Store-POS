@@ -1,6 +1,6 @@
 import type { ApiInfo, LocalConfig, PosBridge } from './vite-env';
 import { logger } from './shared/logger';
-import { API_PORT } from './config/constants';
+import { API_PORT } from './shared/config/constants';
 
 const FALLBACK_PORT = API_PORT;
 

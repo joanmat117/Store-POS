@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getPosBridge } from '../bridge';
+import { getPosBridge } from '../../bridge';
 import { getUploadsBase } from '../api/client';
 
 export type NavView = 'till' | 'catalog' | 'sales' | 'customers' | 'team' | 'settings';

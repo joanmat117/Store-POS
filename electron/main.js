@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import os from 'os';
 import { logger } from '../server/logger.js';
-import { API_PORT } from '../src/config/constants.ts';
+import { API_PORT } from '../src/shared/config/constants.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

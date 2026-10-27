@@ -1,7 +1,7 @@
 import { createServer } from './index.js';
 import fs from 'fs';
 import path from 'path';
-import { API_PORT } from '../src/config/constants.ts';
+import { API_PORT } from '../src/shared/config/constants.ts';
 
 const PORT = API_PORT;
 const DATA_DIR = path.join(process.cwd(), 'data');

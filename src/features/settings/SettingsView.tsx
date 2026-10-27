@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { api, Settings } from '../api/client';
-import { useAuth } from '../context/AuthContext';
-import { getPosBridge } from '../bridge';
-import PhotoPicker from '../components/PhotoPicker';
+import { api, Settings } from '../../shared/api/client';
+import { useAuth } from '../../shared/context/AuthContext';
+import { getPosBridge } from '../../bridge';
+import PhotoPicker from '../../shared/components/PhotoPicker';
 
 type Props = {
   settings: Settings | null;
