@@ -8,11 +8,13 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently -k \"vite\" \"wait-on http://127.0.0.1:5173 && electron .\"",
+    "dev:web": "concurrently -k \"vite\" \"node server/standalone.js\"",
     "build": "vite build",
     "start": "electron .",
     "preview": "vite preview",
     "smoke": "node scripts/smoke-api.mjs && node scripts/smoke-lan.mjs",
-    "dist": "vite build && electron-builder --win"
+    "dist": "vite build && electron-builder --win",
+    "dist:linux": "vite build && electron-builder --linux deb"
   },
   "build": {
     "appId": "com.storepos.app",
@@ -44,6 +46,29 @@
       ],
       "icon": "build/icon.ico",
       "signAndEditExecutable": false
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "Office",
+      "maintainer": "Hosting Domain",
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0",
+        "libuuid1",
+        "libappindicator3-1",
+        "libsecret-1-0"
+      ]
     },
     "nsis": {
       "oneClick": false,
