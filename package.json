@@ -14,7 +14,12 @@
     "preview": "vite preview",
     "smoke": "node scripts/smoke-api.mjs && node scripts/smoke-lan.mjs",
     "dist": "vite build && electron-builder --win",
-    "dist:linux": "vite build && electron-builder --linux deb"
+    "dist:linux": "vite build && electron-builder --linux deb",
+    "lint": "eslint . --ext .ts,.tsx,.js,.mjs,.cjs",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.mjs,.cjs --fix",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "build": {
     "appId": "com.storepos.app",
@@ -51,7 +56,9 @@
       "target": [
         {
           "target": "deb",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "build/icon.png",
@@ -94,13 +101,23 @@
     "sql.js": "^1.12.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
     "@vitejs/plugin-react": "^4.3.4",
     "concurrently": "^9.1.2",
     "electron": "^33.4.11",
     "electron-builder": "^25.1.8",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.7",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.9.10",
     "typescript": "^5.7.3",
+    "typescript-eslint": "^8.72.1",
     "vite": "^6.0.7",
     "wait-on": "^8.0.2"
   }

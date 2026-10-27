@@ -231,7 +231,12 @@ export default function SettingsView({ settings, onSaved }: Props) {
             />
           </div>
           <label
-            style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.75rem' }}
+            style={{
+              display: 'flex',
+              gap: '0.5rem',
+              alignItems: 'center',
+              marginBottom: '0.75rem',
+            }}
           >
             <input
               type="checkbox"
@@ -280,8 +285,8 @@ export default function SettingsView({ settings, onSaved }: Props) {
             />
           </div>
           <p className="muted" style={{ fontSize: '0.85rem' }}>
-            Used to search and download product photos into a local library on this server.
-            Get a free key at{' '}
+            Used to search and download product photos into a local library on this server. Get a
+            free key at{' '}
             <a href="https://www.pexels.com/api/" target="_blank" rel="noreferrer">
               pexels.com/api
             </a>
@@ -290,11 +295,18 @@ export default function SettingsView({ settings, onSaved }: Props) {
         </div>
       </div>
 
-      <button type="button" className="btn btn-primary" onClick={save} style={{ marginTop: '1rem' }}>
+      <button
+        type="button"
+        className="btn btn-primary"
+        onClick={save}
+        style={{ marginTop: '1rem' }}
+      >
         Save settings
       </button>
 
-      <div style={{ marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid var(--line)' }}>
+      <div
+        style={{ marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: '1px solid var(--line)' }}
+      >
         <h3 style={{ marginTop: 0 }}>Demo data</h3>
         <p className="muted" style={{ fontSize: '0.9rem', marginTop: 0 }}>
           Seed a sample South African catalog (categories, products, customers), or wipe catalog and

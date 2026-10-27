@@ -1,12 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  api,
-  Category,
-  Customer,
-  Product,
-  Settings,
-  Transaction,
-} from '../api/client';
+import { api, Category, Customer, Product, Settings, Transaction } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import AppShell, { NavView } from '../layout/AppShell';
 import TillView from './TillView';
@@ -100,11 +93,7 @@ export default function PosPage() {
       onNavigate={setView}
       title={title}
       logo={settings?.img || ''}
-      todaySales={
-        hasPerm('perm_transactions')
-          ? `${symbol}${todayTotal.toFixed(2)}`
-          : undefined
-      }
+      todaySales={hasPerm('perm_transactions') ? `${symbol}${todayTotal.toFixed(2)}` : undefined}
       stats={
         view === 'till' && holdCount > 0 ? (
           <span className="stat-pill">{holdCount} held</span>
@@ -144,23 +133,14 @@ export default function PosPage() {
       )}
 
       {view === 'sales' && (
-        <TransactionsModal
-          embedded
-          open
-          symbol={symbol}
-          onClose={() => setView('till')}
-        />
+        <TransactionsModal embedded open symbol={symbol} onClose={() => setView('till')} />
       )}
 
-      {view === 'customers' && (
-        <CustomersView customers={customers} onChanged={loadAll} />
-      )}
+      {view === 'customers' && <CustomersView customers={customers} onChanged={loadAll} />}
 
       {view === 'team' && <TeamView />}
 
-      {view === 'settings' && (
-        <SettingsView settings={settings} onSaved={loadAll} />
-      )}
+      {view === 'settings' && <SettingsView settings={settings} onSaved={loadAll} />}
     </AppShell>
   );
 }
@@ -173,9 +153,7 @@ function CustomersView({
   onChanged: () => Promise<void>;
 }) {
   // Reuse modal body as always-open panel by rendering CustomersModal embedded-style
-  return (
-    <CustomersPanel customers={customers} onChanged={onChanged} />
-  );
+  return <CustomersPanel customers={customers} onChanged={onChanged} />;
 }
 
 function CustomersPanel({
@@ -231,24 +209,15 @@ function CustomersPanel({
         <h3 style={{ marginTop: 0 }}>{form.id ? 'Edit customer' : 'New customer'}</h3>
         <div className="field">
           <label>Name</label>
-          <input
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
+          <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         </div>
         <div className="field">
           <label>Phone</label>
-          <input
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          />
+          <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
         </div>
         <div className="field">
           <label>Email</label>
-          <input
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
+          <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
         </div>
         <div className="field">
           <label>Address</label>
@@ -407,7 +376,12 @@ function UsersPanel() {
             {label}
           </label>
         ))}
-        <button type="button" className="btn btn-primary" onClick={save} style={{ marginTop: '0.75rem' }}>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={save}
+          style={{ marginTop: '0.75rem' }}
+        >
           {form.id ? 'Update' : 'Add'} user
         </button>
       </div>

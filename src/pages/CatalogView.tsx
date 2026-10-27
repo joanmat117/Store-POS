@@ -88,9 +88,7 @@ export default function CatalogView({
   };
 
   const toggleSelect = (id: number) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   };
 
   const visible = list.filter(
@@ -101,8 +99,7 @@ export default function CatalogView({
       String(p.id).includes(filter)
   );
 
-  const allVisibleSelected =
-    visible.length > 0 && visible.every((p) => selected.includes(p.id));
+  const allVisibleSelected = visible.length > 0 && visible.every((p) => selected.includes(p.id));
 
   const toggleSelectAllVisible = () => {
     if (allVisibleSelected) {
@@ -422,4 +419,3 @@ export default function CatalogView({
     </div>
   );
 }
-

@@ -1,0 +1,42 @@
+# Build outputs
+dist/
+release/
+build/
+
+# Dependencies
+node_modules/
+
+# Database & binary artifacts
+*.sqlite
+*.deb
+*.exe
+*.dmg
+*.AppImage
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# CommonJS Electron files (separate config needed)
+electron/main.js
+electron/preload.cjs
+
+# Standalone server entry
+server/standalone.js
+
+# Scripts
+scripts/
+
+# Config files
+vite.config.ts
+tsconfig.json
+eslint.config.js
+prettier.config.js
+
+# Public assets
+public/
+
+# CI / GitHub
+.github/

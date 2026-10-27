@@ -44,9 +44,7 @@ export default function LoginPage() {
     await refreshApiInfo();
   };
 
-  const needsConn =
-    Boolean(serverError) ||
-    apiInfo?.mode === 'Network Point of Sale Terminal';
+  const needsConn = Boolean(serverError) || apiInfo?.mode === 'Network Point of Sale Terminal';
 
   return (
     <div className="login-wrap">
@@ -81,7 +79,9 @@ export default function LoginPage() {
         </button>
 
         {(needsConn || showConn) && (
-          <div style={{ marginTop: '1.25rem', borderTop: '1px solid var(--line)', paddingTop: '1rem' }}>
+          <div
+            style={{ marginTop: '1.25rem', borderTop: '1px solid var(--line)', paddingTop: '1rem' }}
+          >
             <button
               type="button"
               className="btn btn-ghost"

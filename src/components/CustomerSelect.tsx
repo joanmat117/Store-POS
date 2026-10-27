@@ -10,12 +10,7 @@ type Props = {
 
 const WALK_IN = { id: '0', name: 'Walk-in', phone: '', email: '', address: '' };
 
-export default function CustomerSelect({
-  customers,
-  value,
-  onChange,
-  onCustomersChanged,
-}: Props) {
+export default function CustomerSelect({ customers, value, onChange, onCustomersChanged }: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
@@ -98,9 +93,7 @@ export default function CustomerSelect({
       await onCustomersChanged?.();
       const refreshed = await api.getCustomers();
       const created =
-        refreshed
-          .filter((c) => c.name === newName.trim())
-          .sort((a, b) => b.id - a.id)[0] || null;
+        refreshed.filter((c) => c.name === newName.trim()).sort((a, b) => b.id - a.id)[0] || null;
       setNewName('');
       setNewPhone('');
       setShowQuickAdd(false);
@@ -154,7 +147,11 @@ export default function CustomerSelect({
             />
           </div>
 
-          {error && <div className="error" style={{ margin: '0.5rem 0.65rem' }}>{error}</div>}
+          {error && (
+            <div className="error" style={{ margin: '0.5rem 0.65rem' }}>
+              {error}
+            </div>
+          )}
 
           <div className="customer-options">
             {filtered.map((c) => (
@@ -164,9 +161,7 @@ export default function CustomerSelect({
                 className={`customer-option ${String(c.id) === String(value) || (c.id === '0' && value === '0') ? 'active' : ''}`}
                 onClick={() => pick(String(c.id))}
               >
-                <span className="customer-avatar small">
-                  {c.name.slice(0, 1).toUpperCase()}
-                </span>
+                <span className="customer-avatar small">{c.name.slice(0, 1).toUpperCase()}</span>
                 <span className="customer-meta">
                   <strong>{c.name}</strong>
                   <span>{c.phone || (String(c.id) === '0' ? 'Default guest' : 'No phone')}</span>

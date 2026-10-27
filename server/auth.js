@@ -67,9 +67,7 @@ export function requireAnyPerm(...perms) {
 }
 
 export function loginUser(username, password) {
-  const row = getDb()
-    .prepare('SELECT * FROM users WHERE username = ?')
-    .get(username);
+  const row = getDb().prepare('SELECT * FROM users WHERE username = ?').get(username);
   if (!row) return null;
   if (!bcrypt.compareSync(password, row.password)) return null;
 

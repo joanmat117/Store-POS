@@ -1,12 +1,6 @@
 import { Router } from 'express';
 import { getDb, mapUser } from '../db.js';
-import {
-  authenticate,
-  requirePerm,
-  loginUser,
-  signToken,
-  hashPassword,
-} from '../auth.js';
+import { authenticate, requirePerm, loginUser, signToken, hashPassword } from '../auth.js';
 
 const router = Router();
 
@@ -49,18 +43,14 @@ router.get('/all', requirePerm('perm_users'), (_req, res) => {
   res.json(rows.map(mapUser));
 });
 
-router.delete(
-  '/user/:userId',
-  requirePerm('perm_users'),
-  (req, res) => {
-    const id = parseInt(req.params.userId, 10);
-    if (id === 1) {
-      return res.status(400).json({ error: 'Cannot delete the default admin' });
-    }
-    getDb().prepare('DELETE FROM users WHERE id = ?').run(id);
-    res.sendStatus(200);
+router.delete('/user/:userId', requirePerm('perm_users'), (req, res) => {
+  const id = parseInt(req.params.userId, 10);
+  if (id === 1) {
+    return res.status(400).json({ error: 'Cannot delete the default admin' });
   }
-);
+  getDb().prepare('DELETE FROM users WHERE id = ?').run(id);
+  res.sendStatus(200);
+});
 
 router.post('/post', requirePerm('perm_users'), (req, res) => {
   const body = req.body || {};

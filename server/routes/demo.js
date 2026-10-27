@@ -108,9 +108,7 @@ router.post('/clear', requireAnyPerm('perm_products', 'perm_settings'), (req, re
       out.categories = r.changes || 0;
     }
     if (clearCustomers) {
-      const r = db
-        .prepare("DELETE FROM customers WHERE name != 'Walk-in Customer'")
-        .run();
+      const r = db.prepare("DELETE FROM customers WHERE name != 'Walk-in Customer'").run();
       out.customers = r.changes || 0;
     }
 

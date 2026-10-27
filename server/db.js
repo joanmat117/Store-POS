@@ -103,10 +103,7 @@ export async function initDatabase(filePath) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
 
   if (!SQL) {
-    const wasmPath = path.join(
-      path.dirname(require.resolve('sql.js')),
-      'sql-wasm.wasm'
-    );
+    const wasmPath = path.join(path.dirname(require.resolve('sql.js')), 'sql-wasm.wasm');
     SQL = await initSqlJs({
       locateFile: () => wasmPath,
     });

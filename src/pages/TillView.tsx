@@ -88,10 +88,7 @@ export default function TillView({
     return products.filter((p) => {
       const catOk = categoryFilter === 'all' || p.category === categoryFilter;
       if (!q) return catOk;
-      return (
-        catOk &&
-        (p.name.toLowerCase().includes(q) || String(p.id).includes(q))
-      );
+      return catOk && (p.name.toLowerCase().includes(q) || String(p.id).includes(q));
     });
   }, [products, query, categoryFilter]);
 
@@ -121,9 +118,7 @@ export default function TillView({
           setError(`Only ${product.quantity} available for ${product.name}`);
           return prev;
         }
-        return prev.map((i) =>
-          i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
+        return prev.map((i) => (i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i));
       }
       return [
         ...prev,
@@ -140,9 +135,7 @@ export default function TillView({
 
   const setQty = (id: number, quantity: number) => {
     setCart((prev) =>
-      prev
-        .map((i) => (i.id === id ? { ...i, quantity } : i))
-        .filter((i) => i.quantity > 0)
+      prev.map((i) => (i.id === id ? { ...i, quantity } : i)).filter((i) => i.quantity > 0)
     );
   };
 
@@ -231,8 +224,7 @@ export default function TillView({
     let next = raw.replace(/[^\d.]/g, '');
     const firstDot = next.indexOf('.');
     if (firstDot !== -1) {
-      next =
-        next.slice(0, firstDot + 1) + next.slice(firstDot + 1).replace(/\./g, '');
+      next = next.slice(0, firstDot + 1) + next.slice(firstDot + 1).replace(/\./g, '');
       const [whole, dec = ''] = next.split('.');
       next = `${whole}.${dec.slice(0, 2)}`;
     }
@@ -260,8 +252,7 @@ export default function TillView({
         '--------------------------------',
         ...cart.map(
           (i) =>
-            `${i.quantity} x ${i.name}`.padEnd(22) +
-            `${symbol}${(i.price * i.quantity).toFixed(2)}`
+            `${i.quantity} x ${i.name}`.padEnd(22) + `${symbol}${(i.price * i.quantity).toFixed(2)}`
         ),
         '--------------------------------',
         `Subtotal ${symbol}${subtotal.toFixed(2)}`,
@@ -430,9 +421,7 @@ export default function TillView({
                 </strong>
               </div>
             ))}
-            {!cart.length && (
-              <div className="empty">Cart empty — scan or tap a product</div>
-            )}
+            {!cart.length && <div className="empty">Cart empty — scan or tap a product</div>}
           </div>
 
           <div className="totals">
@@ -583,7 +572,11 @@ export default function TillView({
                   <button type="button" className="btn btn-primary" onClick={() => restoreHold(h)}>
                     Resume
                   </button>{' '}
-                  <button type="button" className="btn btn-danger" onClick={() => discardHold(h.id)}>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => discardHold(h.id)}
+                  >
                     Delete
                   </button>
                 </td>

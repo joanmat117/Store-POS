@@ -144,11 +144,7 @@ export function clearSession() {
   localStorage.removeItem(USER_KEY);
 }
 
-async function request<T>(
-  path: string,
-  options: RequestInit = {},
-  auth = true
-): Promise<T> {
+async function request<T>(path: string, options: RequestInit = {}, auth = true): Promise<T> {
   const headers = new Headers(options.headers || {});
   if (!(options.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
@@ -204,16 +200,13 @@ export const api = {
   saveUser: (body: Record<string, unknown>) =>
     request('/users/post', { method: 'POST', body: JSON.stringify(body) }),
 
-  deleteUser: (id: number) =>
-    request(`/users/user/${id}`, { method: 'DELETE' }),
+  deleteUser: (id: number) => request(`/users/user/${id}`, { method: 'DELETE' }),
 
   getProducts: () => request<Product[]>('/inventory/products'),
 
-  saveProduct: (form: FormData) =>
-    request('/inventory/product', { method: 'POST', body: form }),
+  saveProduct: (form: FormData) => request('/inventory/product', { method: 'POST', body: form }),
 
-  deleteProduct: (id: number) =>
-    request(`/inventory/product/${id}`, { method: 'DELETE' }),
+  deleteProduct: (id: number) => request(`/inventory/product/${id}`, { method: 'DELETE' }),
 
   deleteProducts: (ids: number[]) =>
     request<{ ok: boolean; deleted: number }>('/inventory/products/bulk-delete', {
@@ -235,8 +228,7 @@ export const api = {
   updateCategory: (body: { id: number; name: string }) =>
     request('/categories/category', { method: 'PUT', body: JSON.stringify(body) }),
 
-  deleteCategory: (id: number) =>
-    request(`/categories/category/${id}`, { method: 'DELETE' }),
+  deleteCategory: (id: number) => request(`/categories/category/${id}`, { method: 'DELETE' }),
 
   getCustomers: () => request<Customer[]>('/customers/all'),
 
@@ -246,8 +238,7 @@ export const api = {
   updateCustomer: (body: Partial<Customer>) =>
     request('/customers/customer', { method: 'PUT', body: JSON.stringify(body) }),
 
-  deleteCustomer: (id: number) =>
-    request(`/customers/customer/${id}`, { method: 'DELETE' }),
+  deleteCustomer: (id: number) => request(`/customers/customer/${id}`, { method: 'DELETE' }),
 
   getSettings: () => request<{ _id: number; settings: Settings }>('/settings/get'),
 
@@ -296,8 +287,7 @@ export const api = {
     return request<MediaItem>('/media/upload', { method: 'POST', body: fd });
   },
 
-  deleteMedia: (id: number) =>
-    request(`/media/library/${id}`, { method: 'DELETE' }),
+  deleteMedia: (id: number) => request(`/media/library/${id}`, { method: 'DELETE' }),
 
   seedDemo: () =>
     request<{
@@ -314,10 +304,10 @@ export const api = {
     customers?: boolean;
     transactions?: boolean;
   }) =>
-    request<{ ok: boolean; message: string; deleted: Record<string, number> }>(
-      '/demo/clear',
-      { method: 'POST', body: JSON.stringify(options || {}) }
-    ),
+    request<{ ok: boolean; message: string; deleted: Record<string, number> }>('/demo/clear', {
+      method: 'POST',
+      body: JSON.stringify(options || {}),
+    }),
 
   searchPexels: (q: string, page = 1) => {
     const params = new URLSearchParams({ q, page: String(page), per_page: '20' });

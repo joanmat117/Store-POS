@@ -24,9 +24,7 @@ router.put('/category', requirePerm('perm_categories'), (req, res) => {
 });
 
 router.delete('/category/:categoryId', requirePerm('perm_categories'), (req, res) => {
-  getDb()
-    .prepare('DELETE FROM categories WHERE id = ?')
-    .run(parseInt(req.params.categoryId, 10));
+  getDb().prepare('DELETE FROM categories WHERE id = ?').run(parseInt(req.params.categoryId, 10));
   res.sendStatus(200);
 });
 

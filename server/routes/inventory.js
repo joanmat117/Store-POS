@@ -34,67 +34,50 @@ export default function inventoryRouter(uploadsPath) {
     res.json(mapProduct(row));
   });
 
-  router.post(
-    '/product',
-    requirePerm('perm_products'),
-    upload.single('imagename'),
-    (req, res) => {
-      const body = req.body || {};
-      let image = body.img || '';
+  router.post('/product', requirePerm('perm_products'), upload.single('imagename'), (req, res) => {
+    const body = req.body || {};
+    let image = body.img || '';
 
-      if (req.file) {
-        image = req.file.filename;
-      }
-
-      if (String(body.remove) === '1' && body.img) {
-        const oldPath = path.join(uploadsPath, body.img);
-        try {
-          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-        } catch (err) {
-          console.error(err);
-        }
-        if (!req.file) image = '';
-      }
-
-      const stock = body.stock === 'on' || body.stock === 0 || body.stock === '0' ? 0 : 1;
-      const quantity = body.quantity === '' || body.quantity == null ? 0 : parseInt(body.quantity, 10);
-
-      if (!body.id) {
-        const result = getDb()
-          .prepare(
-            `INSERT INTO products (name, price, category, quantity, stock, img)
-             VALUES (?, ?, ?, ?, ?, ?)`
-          )
-          .run(
-            body.name,
-            parseFloat(body.price) || 0,
-            body.category || '',
-            quantity,
-            stock,
-            image
-          );
-        const row = getDb().prepare('SELECT * FROM products WHERE id = ?').get(result.lastInsertRowid);
-        return res.json(mapProduct(row));
-      }
-
-      const id = parseInt(body.id, 10);
-      getDb()
-        .prepare(
-          `UPDATE products SET name = ?, price = ?, category = ?, quantity = ?, stock = ?, img = ?
-           WHERE id = ?`
-        )
-        .run(
-          body.name,
-          parseFloat(body.price) || 0,
-          body.category || '',
-          quantity,
-          stock,
-          image,
-          id
-        );
-      res.sendStatus(200);
+    if (req.file) {
+      image = req.file.filename;
     }
-  );
+
+    if (String(body.remove) === '1' && body.img) {
+      const oldPath = path.join(uploadsPath, body.img);
+      try {
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      } catch (err) {
+        console.error(err);
+      }
+      if (!req.file) image = '';
+    }
+
+    const stock = body.stock === 'on' || body.stock === 0 || body.stock === '0' ? 0 : 1;
+    const quantity =
+      body.quantity === '' || body.quantity == null ? 0 : parseInt(body.quantity, 10);
+
+    if (!body.id) {
+      const result = getDb()
+        .prepare(
+          `INSERT INTO products (name, price, category, quantity, stock, img)
+             VALUES (?, ?, ?, ?, ?, ?)`
+        )
+        .run(body.name, parseFloat(body.price) || 0, body.category || '', quantity, stock, image);
+      const row = getDb()
+        .prepare('SELECT * FROM products WHERE id = ?')
+        .get(result.lastInsertRowid);
+      return res.json(mapProduct(row));
+    }
+
+    const id = parseInt(body.id, 10);
+    getDb()
+      .prepare(
+        `UPDATE products SET name = ?, price = ?, category = ?, quantity = ?, stock = ?, img = ?
+           WHERE id = ?`
+      )
+      .run(body.name, parseFloat(body.price) || 0, body.category || '', quantity, stock, image, id);
+    res.sendStatus(200);
+  });
 
   router.delete('/product/:productId', requirePerm('perm_products'), (req, res) => {
     const id = parseInt(req.params.productId, 10);

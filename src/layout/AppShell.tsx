@@ -3,13 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { getPosBridge } from '../bridge';
 import { getUploadsBase } from '../api/client';
 
-export type NavView =
-  | 'till'
-  | 'catalog'
-  | 'sales'
-  | 'customers'
-  | 'team'
-  | 'settings';
+export type NavView = 'till' | 'catalog' | 'sales' | 'customers' | 'team' | 'settings';
 
 type Props = {
   view: NavView;
@@ -35,7 +29,11 @@ export default function AppShell({
 
   const items: { id: NavView; label: string; show: boolean }[] = [
     { id: 'till', label: 'Till', show: true },
-    { id: 'catalog', label: 'Catalog', show: hasPerm('perm_products') || hasPerm('perm_categories') },
+    {
+      id: 'catalog',
+      label: 'Catalog',
+      show: hasPerm('perm_products') || hasPerm('perm_categories'),
+    },
     { id: 'sales', label: 'Sales', show: hasPerm('perm_transactions') },
     { id: 'customers', label: 'Customers', show: true },
     { id: 'team', label: 'Team', show: hasPerm('perm_users') },
@@ -88,9 +86,7 @@ export default function AppShell({
           <h1>{title}</h1>
           {stats}
           <div className="spacer" />
-          {todaySales != null && (
-            <div className="stat-pill">Today {todaySales}</div>
-          )}
+          {todaySales != null && <div className="stat-pill">Today {todaySales}</div>}
         </header>
         <main className="main">{children}</main>
       </div>

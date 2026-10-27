@@ -70,7 +70,9 @@ router.get('/by-date', requirePerm('perm_transactions'), (req, res) => {
   }
   sql += ' ORDER BY date DESC';
 
-  const rows = getDb().prepare(sql).all(...params);
+  const rows = getDb()
+    .prepare(sql)
+    .all(...params);
   res.json(rows.map(mapTransaction));
 });
 

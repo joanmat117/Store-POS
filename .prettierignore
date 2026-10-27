@@ -1,0 +1,57 @@
+# Build outputs
+dist/
+release/
+build/
+
+# Dependencies
+node_modules/
+
+# Database & binary artifacts
+*.sqlite
+*.deb
+*.exe
+*.dmg
+*.AppImage
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Config files
+eslint.config.js
+prettier.config.js
+vite.config.ts
+tsconfig.json
+
+# CI / GitHub
+.github/
+
+# Scripts
+scripts/
+
+# Public assets
+public/
+
+# Skills & agent configs (external, not our code)
+.agents/
+.atl/
+skills-lock.json
+
+# Documentation & project files
+*.md
+!src/**/*.md
+
+# Electron/Node CommonJS entry points (different style)
+electron/main.js
+electron/preload.cjs
+server/standalone.js
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+
+# Config files
+.prettierrc
+.eslintignore

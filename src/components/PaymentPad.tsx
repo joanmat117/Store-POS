@@ -66,12 +66,7 @@ export default function PaymentPad({ value, onChange, due, symbol }: Props) {
           Exact
         </button>
         {SA_NOTES.map((note) => (
-          <button
-            key={note}
-            type="button"
-            className="btn"
-            onClick={() => setAmount(note)}
-          >
+          <button key={note} type="button" className="btn" onClick={() => setAmount(note)}>
             {symbol}
             {note}
           </button>
