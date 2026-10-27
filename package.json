@@ -56,7 +56,9 @@
       ],
       "icon": "build/icon.png",
       "category": "Office",
-      "maintainer": "Hosting Domain",
+      "maintainer": "Hosting Domain"
+    },
+    "deb": {
       "depends": [
         "libgtk-3-0",
         "libnotify4",
