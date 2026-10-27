@@ -46,7 +46,7 @@ try {
   const health = await req('/');
   if (health.status !== 'ok') throw new Error('health failed');
 
-  const login = await req('/api/users/login', {
+  const login = await req('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ username: 'admin', password: 'admin' }),
   });
@@ -54,7 +54,7 @@ try {
   const token = login.token;
 
   await req(
-    '/api/categories/category',
+    '/api/categories',
     { method: 'POST', body: JSON.stringify({ name: 'Drinks' }) },
     token
   );

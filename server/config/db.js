@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { createRequire } from 'module';
 import bcrypt from 'bcryptjs';
+import { logger } from '../logger.js';
 
 const require = createRequire(import.meta.url);
 
@@ -249,6 +250,7 @@ function seedDefaults() {
   }
 }
 
+// Mappers - will be moved to respective repos
 export function mapUser(row) {
   if (!row) return null;
   return {

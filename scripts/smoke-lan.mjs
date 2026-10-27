@@ -34,13 +34,13 @@ try {
   const health = await client('127.0.0.1', '/');
   if (health.status !== 'ok') throw new Error('server not reachable');
 
-  const login = await client('127.0.0.1', '/api/users/login', {
+  const login = await client('127.0.0.1', '/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ username: 'admin', password: 'admin' }),
   });
 
   // Unauthenticated write should fail
-  const denied = await fetch(`http://127.0.0.1:${port}/api/categories/category`, {
+  const denied = await fetch(`http://127.0.0.1:${port}/api/categories`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: 'X' }),
@@ -49,7 +49,7 @@ try {
 
   await client(
     '127.0.0.1',
-    '/api/categories/category',
+    '/api/categories',
     { method: 'POST', body: JSON.stringify({ name: 'Snacks' }) },
     login.token
   );

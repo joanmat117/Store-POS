@@ -1,13 +1,13 @@
 import { createServer } from './index.js';
 import fs from 'fs';
 import path from 'path';
-import { API_PORT } from '../src/shared/config/constants.ts';
+import { API_PORT, DEFAULT_JWT_SECRET } from './config/constants.js';
 
 const PORT = API_PORT;
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_PATH = path.join(DATA_DIR, 'pos.sqlite');
 const UPLOADS_PATH = path.join(DATA_DIR, 'uploads');
-const JWT_SECRET = 'store-pos-dev-secret';
+const JWT_SECRET = DEFAULT_JWT_SECRET;
 
 fs.mkdirSync(path.join(UPLOADS_PATH, 'library'), { recursive: true });
 

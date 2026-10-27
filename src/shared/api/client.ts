@@ -186,23 +186,23 @@ export async function healthCheck(healthUrl: string) {
 export const api = {
   login: (username: string, password: string) =>
     request<{ user: User; token: string }>(
-      '/users/login',
+      '/auth/login',
       { method: 'POST', body: JSON.stringify({ username, password }) },
       false
     ),
 
-  checkUsers: () => request<{ ready: boolean }>('/users/check', {}, false),
+  checkUsers: () => request<{ ready: boolean }>('/auth/check', {}, false),
 
-  getUser: (id: number) => request<User>(`/users/user/${id}`),
+  getUser: (id: number) => request<User>(`/users/${id}`),
 
-  logout: (id: number) => request(`/users/logout/${id}`),
+  logout: (id: number) => request(`/users/${id}/logout`),
 
-  getUsers: () => request<User[]>('/users/all'),
+  getUsers: () => request<User[]>('/users'),
 
   saveUser: (body: Record<string, unknown>) =>
-    request('/users/post', { method: 'POST', body: JSON.stringify(body) }),
+    request('/users', { method: 'POST', body: JSON.stringify(body) }),
 
-  deleteUser: (id: number) => request(`/users/user/${id}`, { method: 'DELETE' }),
+  deleteUser: (id: number) => request(`/users/${id}`, { method: 'DELETE' }),
 
   getProducts: () => request<Product[]>('/inventory/products'),
 
@@ -222,31 +222,31 @@ export const api = {
       body: JSON.stringify({ skuCode }),
     }),
 
-  getCategories: () => request<Category[]>('/categories/all'),
+  getCategories: () => request<Category[]>('/categories'),
 
   saveCategory: (body: { name: string }) =>
-    request('/categories/category', { method: 'POST', body: JSON.stringify(body) }),
+    request('/categories', { method: 'POST', body: JSON.stringify(body) }),
 
   updateCategory: (body: { id: number; name: string }) =>
-    request('/categories/category', { method: 'PUT', body: JSON.stringify(body) }),
+    request(`/categories/${body.id}`, { method: 'PUT', body: JSON.stringify(body) }),
 
-  deleteCategory: (id: number) => request(`/categories/category/${id}`, { method: 'DELETE' }),
+  deleteCategory: (id: number) => request(`/categories/${id}`, { method: 'DELETE' }),
 
-  getCustomers: () => request<Customer[]>('/customers/all'),
+  getCustomers: () => request<Customer[]>('/customers'),
 
   saveCustomer: (body: Partial<Customer>) =>
-    request('/customers/customer', { method: 'POST', body: JSON.stringify(body) }),
+    request('/customers', { method: 'POST', body: JSON.stringify(body) }),
 
-  updateCustomer: (body: Partial<Customer>) =>
-    request('/customers/customer', { method: 'PUT', body: JSON.stringify(body) }),
+  updateCustomer: (body: Partial<Customer> & { id: number }) =>
+    request(`/customers/${body.id}`, { method: 'PUT', body: JSON.stringify(body) }),
 
-  deleteCustomer: (id: number) => request(`/customers/customer/${id}`, { method: 'DELETE' }),
+  deleteCustomer: (id: number) => request(`/customers/${id}`, { method: 'DELETE' }),
 
-  getSettings: () => request<{ _id: number; settings: Settings }>('/settings/get'),
+  getSettings: () => request<{ _id: number; settings: Settings }>('/settings'),
 
   saveSettings: (form: FormData) =>
-    request<{ _id: number; settings: Settings }>('/settings/post', {
-      method: 'POST',
+    request<{ _id: number; settings: Settings }>('/settings', {
+      method: 'PUT',
       body: form,
     }),
 
@@ -280,16 +280,16 @@ export const api = {
   deleteTransaction: (orderId: number) =>
     request('/delete', { method: 'POST', body: JSON.stringify({ orderId }) }),
 
-  getMediaLibrary: () => request<MediaItem[]>('/media/library'),
+  getMediaLibrary: () => request<MediaItem[]>('/media'),
 
   uploadMedia: (file: File, alt = '') => {
     const fd = new FormData();
-    fd.append('image', file);
+    fd.append('file', file);
     if (alt) fd.append('alt', alt);
-    return request<MediaItem>('/media/upload', { method: 'POST', body: fd });
+    return request<MediaItem>('/media', { method: 'POST', body: fd });
   },
 
-  deleteMedia: (id: number) => request(`/media/library/${id}`, { method: 'DELETE' }),
+  deleteMedia: (id: number) => request(`/media/${id}`, { method: 'DELETE' }),
 
   seedDemo: () =>
     request<{
