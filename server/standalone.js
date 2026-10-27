@@ -1,8 +1,9 @@
 import { createServer } from './index.js';
 import fs from 'fs';
 import path from 'path';
+import { API_PORT } from '../src/config/constants.ts';
 
-const PORT = 8001;
+const PORT = API_PORT;
 const DATA_DIR = path.join(process.cwd(), 'data');
 const DB_PATH = path.join(DATA_DIR, 'pos.sqlite');
 const UPLOADS_PATH = path.join(DATA_DIR, 'uploads');

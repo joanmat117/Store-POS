@@ -1,3 +1,5 @@
+import { API_PORT } from '../config/constants';
+
 const TOKEN_KEY = 'pos_token';
 const USER_KEY = 'pos_user';
 
@@ -106,7 +108,7 @@ export type Transaction = {
   date: string;
 };
 
-let baseUrl = 'http://127.0.0.1:8001/api';
+let baseUrl = `http://127.0.0.1:${API_PORT}/api`;
 
 export function setBaseUrl(url: string) {
   baseUrl = url.replace(/\/$/, '');

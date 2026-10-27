@@ -11,6 +11,7 @@ import {
 } from '../api/client';
 import type { ApiInfo } from '../vite-env';
 import { getPosBridge } from '../bridge';
+import { logger } from '../shared/logger';
 
 type AuthState = {
   ready: boolean;
@@ -60,7 +61,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const fresh = await api.getUser(getStoredUser()!._id);
             setUser(fresh);
             storeSession(getStoredToken()!, fresh);
-          } catch {
+          } catch (err) {
+            logger.warn({ err }, 'Failed to refresh user session, clearing auth');
             clearSession();
             setUser(null);
             setToken(null);
@@ -84,8 +86,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (user) {
       try {
         await api.logout(user._id);
-      } catch {
-        /* ignore */
+      } catch (err) {
+        logger.debug({ err }, 'Logout API call failed (non-critical)');
       }
     }
     clearSession();

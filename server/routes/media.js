@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { getDb } from '../db.js';
 import { requireAnyPerm } from '../auth.js';
+import { logger } from '../logger.js';
 
 function getPexelsKey() {
   const row = getDb().prepare('SELECT pexels_api_key FROM settings WHERE id = 1').get();
@@ -81,7 +82,10 @@ export default function mediaRouter(uploadsPath) {
     try {
       if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
     } catch (err) {
-      console.error(err);
+      logger.error(
+        { err, operation: 'deleteMediaFile', path: filePath, mediaId: id },
+        'Failed to delete media file'
+      );
     }
     res.sendStatus(200);
   });
@@ -133,7 +137,7 @@ export default function mediaRouter(uploadsPath) {
           photos,
         });
       } catch (err) {
-        console.error(err);
+        logger.error({ err, operation: 'pexelsSearch', query: q, page }, 'Pexels search failed');
         res.status(500).json({ error: err.message || 'Pexels request failed' });
       }
     }
@@ -190,7 +194,10 @@ export default function mediaRouter(uploadsPath) {
           .get(result.lastInsertRowid);
         res.json(mapMedia(row));
       } catch (err) {
-        console.error(err);
+        logger.error(
+          { err, operation: 'pexelsDownload', photoId, imageUrl },
+          'Pexels download failed'
+        );
         res.status(500).json({ error: err.message || 'Download failed' });
       }
     }

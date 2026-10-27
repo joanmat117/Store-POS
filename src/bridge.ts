@@ -1,6 +1,8 @@
 import type { ApiInfo, LocalConfig, PosBridge } from './vite-env';
+import { logger } from './shared/logger';
+import { API_PORT } from './config/constants';
 
-const FALLBACK_PORT = 8001;
+const FALLBACK_PORT = API_PORT;
 
 function browserFallback(): PosBridge {
   const storageKey = 'pos_local_config';
@@ -9,8 +11,8 @@ function browserFallback(): PosBridge {
     try {
       const raw = localStorage.getItem(storageKey);
       if (raw) return { ...defaults(), ...JSON.parse(raw) };
-    } catch {
-      /* ignore */
+    } catch (err) {
+      logger.debug({ err }, 'Failed to parse localStorage config, using defaults');
     }
     return defaults();
   };

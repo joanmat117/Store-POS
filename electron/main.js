@@ -3,12 +3,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import os from 'os';
+import { logger } from '../server/logger.js';
+import { API_PORT } from '../src/config/constants.ts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const isDev = !app.isPackaged;
-const PORT = 8001;
+const PORT = API_PORT;
 
 let mainWindow = null;
 let stopServer = null;
@@ -40,8 +42,8 @@ function readLocalConfig(paths) {
     if (fs.existsSync(paths.localConfig)) {
       return { ...defaults, ...JSON.parse(fs.readFileSync(paths.localConfig, 'utf8')) };
     }
-  } catch {
-    /* ignore */
+  } catch (err) {
+    logger.warn({ err, configPath: paths.localConfig }, 'Failed to read local config, using defaults');
   }
   return defaults;
 }
@@ -187,7 +189,7 @@ app.whenReady().then(async () => {
   try {
     stopServer = await startApiServer(paths, config.mode);
   } catch (err) {
-    console.error('Failed to start API server', err);
+    logger.error({ err, mode: config.mode }, 'Failed to start API server');
   }
 
   createWindow();

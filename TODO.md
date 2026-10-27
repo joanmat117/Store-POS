@@ -3,9 +3,9 @@
 ## Critical (Do First)
 
 ### 1. Add Lint/Typecheck Scripts + PR CI Workflow
-- [ ] Add `eslint`, `prettier`, `typescript` config files
-- [ ] Add npm scripts: `lint`, `lint:fix`, `typecheck`, `format`
-- [ ] Create `.github/workflows/ci.yml` running on PRs:
+- [x] Add `eslint`, `prettier`, `typescript` config files
+- [x] Add npm scripts: `lint`, `lint:fix`, `typecheck`, `format`
+- [x] Create `.github/workflows/ci.yml` running on PRs:
   - `npm ci`
   - `npm run typecheck`
   - `npm run lint`
@@ -13,7 +13,7 @@
 **Why:** Guarantees code quality and catches regressions before merge.
 
 ### 2. Fix Silent Error Swallowing
-- [ ] Replace `catch { /* ignore */ }` with proper logging in:
+- [x] Replace `catch { /* ignore */ }` with proper logging in:
   - `server/routes/inventory.js` (lines 53-55, 107-109, 135-137)
   - `server/routes/transactions.js` (line 161)
   - `server/routes/media.js` (lines 80-82, 182-184)
@@ -21,7 +21,7 @@
   - `src/context/AuthContext.tsx` (lines 63-67, 86-89)
   - `src/pages/PosPage.tsx` (lines 54-56, 62-64)
   - `src/bridge.ts` (lines 12-14)
-- [ ] Add structured logger (pino/winston) or at minimum `console.error`
+- [x] Add structured logger (pino/winston) or at minimum `console.error`
 **Why:** Hidden failures make debugging impossible; logging surfaces issues early.
 
 ## Important
@@ -99,10 +99,10 @@
 **Why:** Guarantees payload shape, reduces runtime errors and security surface.
 
 ### 6. Add Structured Logging
-- [ ] Install `pino` + `pino-pretty`
-- [ ] Create `server/logger.ts` singleton
-- [ ] Replace all `console.log/error` with logger
-- [ ] Add request logging middleware (method, path, status, duration)
+- [x] Install `pino` + `pino-pretty`
+- [x] Create `server/logger.ts` singleton
+- [x] Replace all `console.log/error` with logger
+- [x] Add request logging middleware (method, path, status, duration)
 **Why:** Structured logs enable monitoring, alerting, and faster incident response.
 
 ### 7. Add Environment Config (.env Support)

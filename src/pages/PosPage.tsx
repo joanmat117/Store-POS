@@ -6,6 +6,7 @@ import TillView from './TillView';
 import CatalogView from './CatalogView';
 import SettingsView from './SettingsView';
 import TransactionsModal from '../components/TransactionsModal';
+import { logger } from '../shared/logger';
 
 export default function PosPage() {
   const { hasPerm } = useAuth();
@@ -44,16 +45,16 @@ export default function PosPage() {
           status: 1,
         });
         setTodayTotal(sales.reduce((sum: number, t: Transaction) => sum + Number(t.total || 0), 0));
-      } catch {
-        /* cashiers without perm already filtered */
+      } catch (err) {
+        logger.debug({ err, endpoint: 'getByDate' }, 'Sales fetch failed (permission likely)');
       }
     }
 
     try {
       const holds = await api.getOnHold();
       setHoldCount(holds.length);
-    } catch {
-      /* ignore */
+    } catch (err) {
+      logger.debug({ err, endpoint: 'getOnHold' }, 'Held orders fetch failed');
     }
   };
 

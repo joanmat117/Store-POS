@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { getDb, mapProduct } from '../db.js';
 import { requirePerm } from '../auth.js';
+import { logger } from '../logger.js';
 
 export default function inventoryRouter(uploadsPath) {
   const router = Router();
@@ -47,7 +48,10 @@ export default function inventoryRouter(uploadsPath) {
       try {
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       } catch (err) {
-        console.error(err);
+        logger.error(
+          { err, operation: 'deleteProductImage', path: oldPath },
+          'Failed to delete product image'
+        );
       }
       if (!req.file) image = '';
     }
@@ -88,7 +92,10 @@ export default function inventoryRouter(uploadsPath) {
       try {
         if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
       } catch (err) {
-        console.error(err);
+        logger.error(
+          { err, operation: 'deleteProductImage', path: imgPath },
+          'Failed to delete product image'
+        );
       }
     }
     res.sendStatus(200);
@@ -116,7 +123,10 @@ export default function inventoryRouter(uploadsPath) {
           try {
             if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
           } catch (err) {
-            console.error(err);
+            logger.error(
+              { err, operation: 'bulkDeleteProductImage', path: imgPath, productId: id },
+              'Failed to delete product image'
+            );
           }
         }
       }
