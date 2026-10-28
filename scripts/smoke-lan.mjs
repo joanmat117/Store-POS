@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
-import { createServer } from '../server/index.js';
+import { createServer } from '../server/index.ts';
 
 const tmp = path.join(os.tmpdir(), `pos-lan-smoke-${Date.now()}`);
 const dbPath = path.join(tmp, 'pos.sqlite');

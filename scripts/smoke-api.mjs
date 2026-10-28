@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import { fileURLToPath } from 'url';
-import { createServer } from '../server/index.js';
+import { createServer } from '../server/index.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const tmp = path.join(os.tmpdir(), `pos-smoke-${Date.now()}`);

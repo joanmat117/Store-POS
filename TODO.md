@@ -123,11 +123,14 @@
 **Why:** Separation of concerns, testability, and clear ownership per layer. Prepares for TypeScript migration (step 7) and Drizzle ORM (step 8).
 
 ### 7. Migrate Server to TypeScript
-- [ ] Add `tsconfig.backend.json` (ESM, target ES2022, strict, outDir `server/dist`)
-- [ ] Rename `server/**/*.js` → `server/**/*.ts`; fix imports, add types
-- [ ] **Dev**: spawn `node --loader ts-node/esm server/index.ts` from Electron main
-- [ ] **Prod**: add `prePackage` hook (Electron Forge) or `build:backend` script (electron-builder) running `tsc -p tsconfig.backend.json`; Electron spawns `server/dist/index.js`
-- [ ] Use `app.isPackaged` to switch between dev/prod entry point
+- [x] Add `tsconfig.backend.json` (ESM, target ES2022, strict, outDir `server/dist`)
+- [x] Rename `server/**/*.js` → `server/**/*.ts`; fix imports, add types
+- [x] **Dev**: spawn `node --loader ts-node/esm server/index.ts` from Electron main (via dev.mjs wrapper)
+- [x] **Prod**: add `prePackage` hook (electron-builder) running `tsc -p tsconfig.backend.json`; Electron spawns `server/dist/index.js`
+- [x] Use `app.isPackaged` to switch between dev/prod entry point
+- [x] Add `build:backend` and `dev:backend` npm scripts
+- [x] Update smoke tests to use ts-node/esm
+- [x] Create dev entry point (`server/dev.mjs` + `server/dev-server.ts`) for hot reload
 **Why:** Type safety across backend; zero-runtime-overhead in production.
 
 ### 8. Add Request Validation (Zod)

@@ -26,12 +26,12 @@ function getUserDataPaths() {
   };
 }
 
-function ensureDirs(paths) {
+function ensureDirs(paths: ReturnType<typeof getUserDataPaths>) {
   fs.mkdirSync(paths.dbDir, { recursive: true });
   fs.mkdirSync(paths.uploads, { recursive: true });
 }
 
-function readLocalConfig(paths) {
+function readLocalConfig(paths: ReturnType<typeof getUserDataPaths>) {
   const defaults = {
     mode: 'Standalone Point of Sale',
     serverIp: '',
@@ -48,12 +48,12 @@ function readLocalConfig(paths) {
   return defaults;
 }
 
-function writeLocalConfig(paths, config) {
+function writeLocalConfig(paths: ReturnType<typeof getUserDataPaths>, config: object) {
   ensureDirs(paths);
   fs.writeFileSync(paths.localConfig, JSON.stringify(config, null, 2));
 }
 
-function getLanIp() {
+function getLanIp(): string {
   const nets = os.networkInterfaces();
   for (const name of Object.keys(nets)) {
     for (const net of nets[name] || []) {
@@ -65,19 +65,22 @@ function getLanIp() {
   return '127.0.0.1';
 }
 
-function shouldStartServer(mode) {
+function shouldStartServer(mode: string): boolean {
   return (
     mode === 'Standalone Point of Sale' ||
     mode === 'Network Point of Sale Server'
   );
 }
 
-async function startApiServer(paths, mode) {
+async function startApiServer(paths: ReturnType<typeof getUserDataPaths>, mode: string): Promise<(() => Promise<void>) | null> {
   if (!shouldStartServer(mode)) {
     return null;
   }
 
-  const { createServer } = await import('../server/index.js');
+  // Dev: use ts-node/esm with .ts files | Prod: use compiled .js from dist/
+  const entryPoint = isDev ? '../server/index.ts' : '../server/dist/index.js';
+  const { createServer } = await import(entryPoint);
+  
   const host = mode === 'Network Point of Sale Server' ? '0.0.0.0' : '127.0.0.1';
   const expressApp = await createServer({
     dbPath: paths.dbFile,
@@ -85,7 +88,7 @@ async function startApiServer(paths, mode) {
     jwtSecret: app.getPath('userData') + '-store-pos-jwt',
   });
 
-  const httpServer = await new Promise((resolve, reject) => {
+  const httpServer = await new Promise<import('http').Server>((resolve, reject) => {
     const server = expressApp.listen(PORT, host, () => {
       console.log(`POS API listening on ${host}:${PORT}`);
       resolve(server);
@@ -94,7 +97,7 @@ async function startApiServer(paths, mode) {
   });
 
   return () =>
-    new Promise((resolve) => {
+    new Promise<void>((resolve) => {
       httpServer.close(() => resolve());
     });
 }
@@ -146,7 +149,7 @@ ipcMain.handle('get-local-config', () => {
   return readLocalConfig(paths);
 });
 
-ipcMain.handle('set-local-config', (_event, config) => {
+ipcMain.handle('set-local-config', (_event, config: object) => {
   const paths = getUserDataPaths();
   const current = readLocalConfig(paths);
   const next = { ...current, ...config };

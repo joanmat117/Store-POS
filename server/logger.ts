@@ -21,7 +21,11 @@ export const logger = pino({
   },
 });
 
-export function createChildLogger(bindings: Record<string, unknown>) {
+/**
+ * @param {Record<string, unknown>} bindings
+ * @returns {import('pino').Logger}
+ */
+export function createChildLogger(bindings: Record<string, unknown>): pino.Logger {
   return logger.child(bindings);
 }
 

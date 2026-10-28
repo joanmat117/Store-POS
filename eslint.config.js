@@ -18,6 +18,8 @@ export default tseslint.config(
       'electron/main.js',
       'electron/preload.cjs',
       'server/standalone.js',
+      'server/**/*.ts',
+      'server/dev-server.ts',
       'scripts/**',
       'build/**',
       'public/**',
@@ -27,6 +29,7 @@ export default tseslint.config(
       'vite.config.ts',
       'eslint.config.js',
       'prettier.config.js',
+      'server/dist/**',
     ],
   },
 
@@ -38,6 +41,7 @@ export default tseslint.config(
 
   // Node.js / CommonJS server files
   {
+    ignores: ['dist/**', 'release/**'],
     files: ['server/**/*.js', 'server/**/*.mjs', 'server/**/*.cjs'],
     plugins: {
       prettier: prettierPlugin,
