@@ -1,3 +1,8 @@
+// PRIMERA LÍNEA - antes de cualquier import que use constants
+import { loadEnv, validateProductionEnv } from './config/env.js';
+loadEnv();
+validateProductionEnv();
+
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';

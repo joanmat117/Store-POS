@@ -146,14 +146,14 @@
 - [ ] Apply middleware to all POST/PUT routes
 **Why:** Guarantees payload shape, reduces runtime errors and security surface.
 
-### 6. Add Structured Logging
+### 9. Add Structured Logging
 - [x] Install `pino` + `pino-pretty`
 - [x] Create `server/logger.ts` singleton
 - [x] Replace all `console.log/error` with logger
 - [x] Add request logging middleware (method, path, status, duration)
 **Why:** Structured logs enable monitoring, alerting, and faster incident response.
 
-### 7. Add Environment Config (.env Support)
+### 10. Add Environment Config (.env Support)
 - [ ] Install `dotenv`
 - [ ] Create `.env.example` with:
   - `API_PORT=8001`
@@ -164,7 +164,7 @@
 - [ ] Update `electron/main.ts` to pass env to server
 **Why:** Keeps secrets out of source control and allows per‑environment tuning.
 
-### 8. Introduce Drizzle ORM & Migrate from sql.js
+### 11. Introduce Drizzle ORM & Migrate from sql.js
 - [x] Add `drizzle-orm`, `drizzle-kit`, `better-sqlite3` (or `libsql`) dependencies
 - [x] Define schema files under `server/db/schema/` (users, products, categories, customers, settings, media_library, transactions)
 - [x] Create `server/db/index.ts` exporting `db` instance (Drizzle + SQLite driver)
@@ -173,13 +173,13 @@
 - [x] Remove `sql.js` and related WASM handling
 **Why:** Type‑safe, maintainable database layer; eliminates manual schema sync and WASM overhead.
 
-### 9. Database Migrations System (Drizzle‑kit)
+### 12. Database Migrations System (Drizzle‑kit)
 - [x] Configure `drizzle.config.ts` pointing to schema and migration folder
 - [x] Add npm scripts `db:generate`, `db:migrate`, `db:push`
 - [x] Run migrations on app startup (via `db:migrate` in `initDatabase`)
 **Why:** Versioned, repeatable schema changes; works in CI/CD and Docker.
 
-### 10. Docker Support
+### 13. Docker Support
 - [ ] Create `Dockerfile` (multi-stage: builder → runtime)
 - [ ] Create `docker-compose.yml` with:
   - `app` service (build from Dockerfile)
@@ -188,7 +188,7 @@
 - [ ] Add `.dockerignore`
 **Why:** Consistent reproducible builds; simplifies deployment on servers or CI.
 
-### 11. Update Documentation
+### 14. Update Documentation
 - [ ] Update `README.md` with new scripts (lint, typecheck, dev:web, db:*)
 - [ ] Document `.env` configuration
 - [ ] Document Docker usage
@@ -197,17 +197,17 @@
 
 ## Nice to Have
 
-### 12. API Versioning
+### 15. API Versioning
 - [ ] Prefix all routes with `/api/v1/`
 - [ ] Update client.ts base URL
 **Why:** Allows future breaking changes without breaking existing clients.
 
-### 13. Automated DB Backup
+### 16. Automated DB Backup
 - [ ] Add scheduled backup in Electron main process (daily)
 - [ ] Keep last 7 days in `userData/backups/`
 **Why:** Protects against data loss without manual intervention.
 
-### 14. Health Check Endpoint Enhancement
+### 17. Health Check Endpoint Enhancement
 - [ ] Add DB connectivity check to `/api/health`
 - [ ] Return version, uptime, db status
 **Why:** Enables load balancers / orchestrators to detect unhealthy instances.

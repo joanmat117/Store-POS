@@ -1,13 +1,66 @@
+// electron/main.js
 import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import os from 'os';
+import dotenv from 'dotenv';
 import { logger } from '../server/logger.js';
-import { API_PORT } from '../src/shared/config/constants.ts';
+import { API_PORT, getJwtSecret } from '../server/config/constants.js';
 
+// ========== ENV SETUP - PRIMERO, ANTES DE NADA ==========
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// 1. Generar .env seguro en primer arranque empaquetado (si no existe)
+function ensureEnvFileExists() {
+  if (!app.isPackaged) return;
+
+  try {
+    const userDataPath = app.getPath('userData');
+    const envPath = path.join(userDataPath, '.env');
+    
+    if (!fs.existsSync(envPath)) {
+      const secret = require('crypto').randomBytes(32).toString('hex');
+      const content = [
+        `# Generado automáticamente en primer arranque`,
+        `JWT_SECRET=${secret}`,
+        `NODE_ENV=production`,
+        `API_PORT=8001`,
+        `CORS_ORIGIN=*`,
+        ``
+      ].join('\n');
+      
+      fs.writeFileSync(envPath, content, { mode: 0o600 });
+      console.log('🔐 Generado .env seguro en:', envPath);
+    }
+  } catch (err) {
+    console.error('❌ No se pudo generar .env automático:', err);
+  }
+}
+
+// 2. Cargar variables de entorno (respeta .env generado arriba)
+function loadEnv() {
+  // Dev: raíz del proyecto
+  const projectRoot = path.resolve(__dirname, '../');
+  dotenv.config({ path: path.join(projectRoot, '.env') });
+
+  // Empaquetado: junto a recursos
+  if (app.isPackaged && process.resourcesPath) {
+    dotenv.config({ path: path.join(process.resourcesPath, '.env') });
+  }
+
+  // UserData: configurable por usuario final
+  try {
+    const userDataPath = app.getPath('userData');
+    dotenv.config({ path: path.join(userDataPath, '.env') });
+  } catch {
+    // app no listo aún
+  }
+}
+
+ensureEnvFileExists();
+loadEnv();
 
 const isDev = !app.isPackaged;
 const PORT = API_PORT;
@@ -26,12 +79,12 @@ function getUserDataPaths() {
   };
 }
 
-function ensureDirs(paths: ReturnType<typeof getUserDataPaths>) {
+function ensureDirs(paths) {
   fs.mkdirSync(paths.dbDir, { recursive: true });
   fs.mkdirSync(paths.uploads, { recursive: true });
 }
 
-function readLocalConfig(paths: ReturnType<typeof getUserDataPaths>) {
+function readLocalConfig(paths) {
   const defaults = {
     mode: 'Standalone Point of Sale',
     serverIp: '',
@@ -48,12 +101,12 @@ function readLocalConfig(paths: ReturnType<typeof getUserDataPaths>) {
   return defaults;
 }
 
-function writeLocalConfig(paths: ReturnType<typeof getUserDataPaths>, config: object) {
+function writeLocalConfig(paths, config) {
   ensureDirs(paths);
   fs.writeFileSync(paths.localConfig, JSON.stringify(config, null, 2));
 }
 
-function getLanIp(): string {
+function getLanIp() {
   const nets = os.networkInterfaces();
   for (const name of Object.keys(nets)) {
     for (const net of nets[name] || []) {
@@ -65,14 +118,14 @@ function getLanIp(): string {
   return '127.0.0.1';
 }
 
-function shouldStartServer(mode: string): boolean {
+function shouldStartServer(mode) {
   return (
     mode === 'Standalone Point of Sale' ||
     mode === 'Network Point of Sale Server'
   );
 }
 
-async function startApiServer(paths: ReturnType<typeof getUserDataPaths>, mode: string): Promise<(() => Promise<void>) | null> {
+async function startApiServer(paths, mode) {
   if (!shouldStartServer(mode)) {
     return null;
   }
@@ -85,10 +138,10 @@ async function startApiServer(paths: ReturnType<typeof getUserDataPaths>, mode: 
   const expressApp = await createServer({
     dbPath: paths.dbFile,
     uploadsPath: paths.uploads,
-    jwtSecret: app.getPath('userData') + '-store-pos-jwt',
+    jwtSecret: getJwtSecret(),
   });
 
-  const httpServer = await new Promise<import('http').Server>((resolve, reject) => {
+  const httpServer = await new Promise((resolve, reject) => {
     const server = expressApp.listen(PORT, host, () => {
       console.log(`POS API listening on ${host}:${PORT}`);
       resolve(server);
@@ -97,7 +150,7 @@ async function startApiServer(paths: ReturnType<typeof getUserDataPaths>, mode: 
   });
 
   return () =>
-    new Promise<void>((resolve) => {
+    new Promise((resolve) => {
       httpServer.close(() => resolve());
     });
 }
@@ -149,7 +202,7 @@ ipcMain.handle('get-local-config', () => {
   return readLocalConfig(paths);
 });
 
-ipcMain.handle('set-local-config', (_event, config: object) => {
+ipcMain.handle('set-local-config', (_event, config) => {
   const paths = getUserDataPaths();
   const current = readLocalConfig(paths);
   const next = { ...current, ...config };

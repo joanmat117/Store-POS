@@ -1,26 +1,31 @@
+// PRIMERA LÍNEA
+import { loadEnv, validateProductionEnv, getEnv } from './config/env.js';
+loadEnv();
+validateProductionEnv();
+
 import { createServer } from './index.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { API_PORT, DEFAULT_JWT_SECRET } from './config/constants.js';
+import { getApiPort } from './config/constants.js';
+import { getDbPath, getUploadsPath, getLibraryPath, ensureDataDirs } from './config/paths.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = API_PORT;
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DB_PATH = path.join(DATA_DIR, 'pos.sqlite');
-const UPLOADS_PATH = path.join(DATA_DIR, 'uploads');
-const JWT_SECRET = DEFAULT_JWT_SECRET;
+const PORT = getApiPort();
+const DB_PATH = getDbPath();
+const UPLOADS_PATH = getUploadsPath();
 
-fs.mkdirSync(path.join(UPLOADS_PATH, 'library'), { recursive: true });
+ensureDataDirs();
+fs.mkdirSync(getLibraryPath(), { recursive: true });
 
 const expressApp = await createServer({
   dbPath: DB_PATH,
   uploadsPath: UPLOADS_PATH,
-  jwtSecret: JWT_SECRET,
+  jwtSecret: getEnv('JWT_SECRET', 'store-pos-dev-secret'),
 });
 
-expressApp.listen(PORT, '127.0.0.1', () => {
-  console.log(`POS API listening on http://127.0.0.1:${PORT}`);
+expressApp.listen(PORT, '0.0.0.0', () => {
+  console.log(`POS API listening on http://0.0.0.0:${PORT}`);
 });
