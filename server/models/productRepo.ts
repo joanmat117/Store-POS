@@ -1,90 +1,107 @@
-import { getDb } from '../config/db.js';
+import { getDb } from '../db/index.js';
+import { products } from '../db/schema/index.js';
+import { eq, or, sql } from 'drizzle-orm';
 import type { ProductRow, ProductDTO } from '../types/index.js';
-import { mapProduct } from '../config/db.js';
+
+function mapProduct(row: ProductRow | undefined): ProductDTO | null {
+  if (!row) return null;
+  return {
+    _id: row.id,
+    id: row.id,
+    name: row.name,
+    price: row.price,
+    category: row.category,
+    quantity: row.quantity,
+    stock: row.stock,
+    img: row.img,
+  };
+}
 
 export const productRepo = {
-  findAll(): ProductDTO[] {
-    return (getDb().prepare('SELECT * FROM products ORDER BY name').all() as unknown as ProductRow[])
-      .map(mapProduct)
-      .filter((p): p is ProductDTO => p !== null);
+  async findAll(): Promise<ProductDTO[]> {
+    const rows = await getDb().select().from(products).orderBy(products.name);
+    return rows.map(mapProduct).filter((p): p is ProductDTO => p !== null);
   },
-  findById(id: number): ProductDTO | null {
-    const row = getDb().prepare('SELECT * FROM products WHERE id = ?').get(id) as ProductRow | undefined;
-    return mapProduct(row);
+  async findById(id: number): Promise<ProductDTO | null> {
+    const result = await getDb().select().from(products).where(eq(products.id, id)).limit(1);
+    return mapProduct(result[0]);
   },
-  findBySku(skuCode: string): ProductDTO | null {
-    const row = getDb()
-      .prepare('SELECT * FROM products WHERE id = ? OR name = ?')
-      .get(parseInt(skuCode, 10) || -1, String(skuCode || '')) as ProductRow | undefined;
-    return mapProduct(row);
+  async findBySku(skuCode: string): Promise<ProductDTO | null> {
+    const id = parseInt(skuCode, 10) || -1;
+    const result = await getDb()
+      .select()
+      .from(products)
+      .where(or(eq(products.id, id), eq(products.name, String(skuCode || ''))))
+      .limit(1);
+    return mapProduct(result[0]);
   },
-  create(productData: {
+  async create(productData: {
     name: string;
     price: number;
     category: string;
     quantity: number;
     stock: number;
     img: string;
-  }): ProductDTO {
-    const result = getDb()
-      .prepare(`INSERT INTO products (name, price, category, quantity, stock, img)
-                VALUES (?, ?, ?, ?, ?, ?)`)
-      .run(
-        productData.name,
-        productData.price,
-        productData.category,
-        productData.quantity,
-        productData.stock,
-        productData.img
-      );
-    const product = this.findById(result.lastInsertRowid);
+  }): Promise<ProductDTO> {
+    const result = await getDb()
+      .insert(products)
+      .values({
+        name: productData.name,
+        price: productData.price,
+        category: productData.category,
+        quantity: productData.quantity,
+        stock: productData.stock,
+        img: productData.img,
+      })
+      .returning({ id: products.id });
+    const product = await this.findById(result[0].id);
     if (!product) throw new Error('Failed to create product');
     return product;
   },
-  update(id: number, productData: {
+  async update(id: number, productData: {
     name: string;
     price: number;
     category: string;
     quantity: number;
     stock: number;
     img: string;
-  }): ProductDTO | null {
-    getDb()
-      .prepare(`UPDATE products SET name = ?, price = ?, category = ?, quantity = ?, stock = ?, img = ? WHERE id = ?`)
-      .run(
-        productData.name,
-        productData.price,
-        productData.category,
-        productData.quantity,
-        productData.stock,
-        productData.img,
-        id
-      );
+  }): Promise<ProductDTO | null> {
+    await getDb()
+      .update(products)
+      .set({
+        name: productData.name,
+        price: productData.price,
+        category: productData.category,
+        quantity: productData.quantity,
+        stock: productData.stock,
+        img: productData.img,
+      })
+      .where(eq(products.id, id));
     return this.findById(id);
   },
-  delete(id: number): string | undefined {
-    const row = getDb().prepare('SELECT img FROM products WHERE id = ?').get(id) as { img: string } | undefined;
-    getDb().prepare('DELETE FROM products WHERE id = ?').run(id);
-    return row?.img;
+  async delete(id: number): Promise<string | undefined> {
+    const row = await getDb().select({ img: products.img }).from(products).where(eq(products.id, id)).limit(1);
+    await getDb().delete(products).where(eq(products.id, id));
+    return row[0]?.img;
   },
-  bulkDelete(ids: number[]): { deleted: number; images: string[] } {
-    const db = getDb();
+  async bulkDelete(ids: number[]): Promise<{ deleted: number; images: string[] }> {
     let deleted = 0;
     const images: string[] = [];
-    const getImg = db.prepare('SELECT img FROM products WHERE id = ?');
-    const del = db.prepare('DELETE FROM products WHERE id = ?');
-    db.transaction(() => {
-      for (const id of ids) {
-        const row = getImg.get(id) as { img: string } | undefined;
-        const result = del.run(id);
-        if (result.changes) deleted += 1;
-        if (row?.img) images.push(row.img);
-      }
-    })();
+
+    for (const id of ids) {
+      const row = await getDb().select({ img: products.img }).from(products).where(eq(products.id, id)).limit(1);
+      const result = await getDb().delete(products).where(eq(products.id, id));
+      if (result.changes) deleted += 1;
+      if (row[0]?.img) images.push(row[0].img);
+    }
     return { deleted, images };
   },
-  decrementQuantity(id: number, qty: number): { changes: number } {
-    return getDb().prepare('UPDATE products SET quantity = MAX(0, quantity - ?) WHERE id = ? AND stock = 1').run(qty, id);
+  async decrementQuantity(id: number, qty: number): Promise<{ changes: number }> {
+    const result = await getDb()
+      .update(products)
+      .set({ quantity: sql`MAX(0, ${products.quantity} - ${qty})` })
+      .where(eq(products.id, id));
+    return { changes: result.changes ?? 0 };
   },
   mapProduct,
 };

@@ -1,26 +1,51 @@
-import { getDb } from '../config/db.js';
+import { getDb } from '../db/index.js';
+import { settings } from '../db/schema/index.js';
+import { eq } from 'drizzle-orm';
 import type { SettingsRow, SettingsDTO, SettingsFormData } from '../types/index.js';
-import { mapSettings } from '../config/db.js';
+
+function mapSettings(row: SettingsRow | undefined): SettingsDTO | null {
+  if (!row) return null;
+  return {
+    _id: 1,
+    settings: {
+      app: row.app,
+      store: row.store,
+      address_one: row.address_one,
+      address_two: row.address_two,
+      contact: row.contact,
+      tax: row.tax,
+      symbol: row.symbol,
+      percentage: row.percentage,
+      charge_tax: !!row.charge_tax,
+      footer: row.footer,
+      img: row.img,
+      till: row.till,
+      ip: row.server_ip,
+      pexels_api_key: row.pexels_api_key || '',
+    },
+  };
+}
+
+const ALLOWED_SETTINGS_FIELDS = [
+  'app', 'store', 'address_one', 'address_two', 'contact', 'tax', 'symbol',
+  'percentage', 'charge_tax', 'footer', 'img', 'till', 'server_ip', 'pexels_api_key',
+] as const;
 
 export const settingsRepo = {
-  find(): SettingsDTO | null {
-    const row = getDb().prepare('SELECT * FROM settings WHERE id = 1').get() as SettingsRow | undefined;
-    return mapSettings(row);
+  async find(): Promise<SettingsDTO | null> {
+    const result = await getDb().select().from(settings).where(eq(settings.id, 1)).limit(1);
+    return mapSettings(result[0]);
   },
-  update(settingsData: SettingsFormData): SettingsDTO | null {
-    const dbInstance = getDb();
-    const fields: string[] = [];
-    const values: unknown[] = [];
-    const allowed = ['app', 'store', 'address_one', 'address_two', 'contact', 'tax', 'symbol', 'percentage', 'charge_tax', 'footer', 'img', 'till', 'server_ip', 'pexels_api_key'];
-    for (const key of allowed) {
-      if (settingsData[key as keyof SettingsFormData] !== undefined) {
-        fields.push(`${key} = ?`);
-        values.push(settingsData[key as keyof SettingsFormData]);
+  async update(settingsData: SettingsFormData): Promise<SettingsDTO | null> {
+    const updateData: Partial<SettingsRow> = {};
+    for (const key of ALLOWED_SETTINGS_FIELDS) {
+      const value = settingsData[key as keyof SettingsFormData];
+      if (value !== undefined) {
+        (updateData as Record<string, unknown>)[key] = value;
       }
     }
-    if (!fields.length) return this.find();
-    values.push(1);
-    dbInstance.prepare(`UPDATE settings SET ${fields.join(', ')} WHERE id = ?`).run(...values);
+    if (Object.keys(updateData).length === 0) return this.find();
+    await getDb().update(settings).set(updateData).where(eq(settings.id, 1));
     return this.find();
   },
   mapSettings,

@@ -15,7 +15,7 @@ export const authController = {
     res.json({ token, user });
   },
   async checkUsers(req: Request, res: Response): Promise<void> {
-    const users = userRepo.findAll();
+    const users = await userRepo.findAll();
     res.json({ ready: users.length > 0 });
   },
 };

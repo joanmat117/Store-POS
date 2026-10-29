@@ -1,60 +1,91 @@
-import { getDb } from '../config/db.js';
+import { getDb } from '../db/index.js';
+import { users } from '../db/schema/index.js';
+import { eq } from 'drizzle-orm';
 import type { UserRow, UserDTO, CreateUserData, UpdateUserData } from '../types/index.js';
-import { mapUser } from '../config/db.js';
+import bcrypt from 'bcryptjs';
+
+function mapUser(row: UserRow | undefined): UserDTO | null {
+  if (!row) return null;
+  return {
+    _id: row.id,
+    id: row.id,
+    username: row.username,
+    fullname: row.fullname,
+    perm_products: row.perm_products,
+    perm_categories: row.perm_categories,
+    perm_transactions: row.perm_transactions,
+    perm_users: row.perm_users,
+    perm_settings: row.perm_settings,
+    status: row.status,
+  };
+}
 
 export const userRepo = {
-  findByUsername(username: string): UserRow | undefined {
-    return getDb().prepare('SELECT * FROM users WHERE username = ?').get(username) as UserRow | undefined;
+  async findByUsername(username: string): Promise<UserRow | undefined> {
+    const result = await getDb().select().from(users).where(eq(users.username, username)).limit(1);
+    return result[0];
   },
-  findById(id: number): UserRow | undefined {
-    return getDb().prepare('SELECT * FROM users WHERE id = ?').get(id) as UserRow | undefined;
+  async findById(id: number): Promise<UserRow | undefined> {
+    const result = await getDb().select().from(users).where(eq(users.id, id)).limit(1);
+    return result[0];
   },
-  findAll(): UserRow[] {
-    return getDb().prepare('SELECT * FROM users').all() as unknown as UserRow[];
+  async findAll(): Promise<UserRow[]> {
+    return getDb().select().from(users);
   },
-  create(userData: CreateUserData): UserDTO {
-    const result = getDb()
-      .prepare(`INSERT INTO users (username, password, fullname, perm_products, perm_categories, perm_transactions, perm_users, perm_settings, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(
-        userData.username,
-        userData.password,
-        userData.fullname || '',
-        userData.perm_products || 0,
-        userData.perm_categories || 0,
-        userData.perm_transactions || 0,
-        userData.perm_users || 0,
-        userData.perm_settings || 0,
-        userData.status || ''
-      );
-    const user = this.findById(result.lastInsertRowid);
+  async create(userData: CreateUserData): Promise<UserDTO> {
+    const hashedPassword = bcrypt.hashSync(userData.password, 10);
+    const result = await getDb()
+      .insert(users)
+      .values({
+        username: userData.username,
+        password: hashedPassword,
+        fullname: userData.fullname || '',
+        perm_products: userData.perm_products || 0,
+        perm_categories: userData.perm_categories || 0,
+        perm_transactions: userData.perm_transactions || 0,
+        perm_users: userData.perm_users || 0,
+        perm_settings: userData.perm_settings || 0,
+        status: userData.status || '',
+      })
+      .returning({ id: users.id });
+    const user = await this.findById(result[0].id);
     if (!user) throw new Error('Failed to create user');
     return mapUser(user)!;
   },
-  update(id: number, userData: UpdateUserData): UserDTO | null {
-    getDb()
-      .prepare(`UPDATE users SET username = ?, fullname = ?, perm_products = ?, perm_categories = ?, perm_transactions = ?, perm_users = ?, perm_settings = ? WHERE id = ?`)
-      .run(
-        userData.username,
-        userData.fullname || '',
-        userData.perm_products || 0,
-        userData.perm_categories || 0,
-        userData.perm_transactions || 0,
-        userData.perm_users || 0,
-        userData.perm_settings || 0,
-        id
-      );
-    const user = this.findById(id);
+  async update(id: number, userData: UpdateUserData): Promise<UserDTO | null> {
+    await getDb()
+      .update(users)
+      .set({
+        username: userData.username,
+        fullname: userData.fullname || '',
+        perm_products: userData.perm_products || 0,
+        perm_categories: userData.perm_categories || 0,
+        perm_transactions: userData.perm_transactions || 0,
+        perm_users: userData.perm_users || 0,
+        perm_settings: userData.perm_settings || 0,
+      })
+      .where(eq(users.id, id));
+    const user = await this.findById(id);
     return user ? mapUser(user) : null;
   },
-  updatePassword(id: number, password: string): { changes: number } {
-    return getDb().prepare('UPDATE users SET password = ? WHERE id = ?').run(password, id);
+  async updatePassword(id: number, password: string): Promise<{ changes: number }> {
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    const result = await getDb()
+      .update(users)
+      .set({ password: hashedPassword })
+      .where(eq(users.id, id));
+    return { changes: result.changes ?? 0 };
   },
-  updateStatus(id: number, status: string): { changes: number } {
-    return getDb().prepare('UPDATE users SET status = ? WHERE id = ?').run(status, id);
+  async updateStatus(id: number, status: string): Promise<{ changes: number }> {
+    const result = await getDb()
+      .update(users)
+      .set({ status })
+      .where(eq(users.id, id));
+    return { changes: result.changes ?? 0 };
   },
-  delete(id: number): { changes: number } {
-    return getDb().prepare('DELETE FROM users WHERE id = ?').run(id);
+  async delete(id: number): Promise<{ changes: number }> {
+    const result = await getDb().delete(users).where(eq(users.id, id));
+    return { changes: result.changes ?? 0 };
   },
   mapUser,
 };

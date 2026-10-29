@@ -51,7 +51,7 @@ export const inventoryService = {
     });
   },
   async deleteProduct(id: number, uploadsPath: string): Promise<{ ok: boolean }> {
-    const img = productRepo.delete(id);
+    const img = await productRepo.delete(id);
     if (img) {
       const imgPath = path.join(uploadsPath, img);
       try {
@@ -63,7 +63,7 @@ export const inventoryService = {
     return { ok: true };
   },
   async bulkDeleteProducts(ids: number[], uploadsPath: string): Promise<{ ok: boolean; deleted: number }> {
-    const { deleted, images } = productRepo.bulkDelete(ids);
+    const { deleted, images } = await productRepo.bulkDelete(ids);
     for (const img of images) {
       const imgPath = path.join(uploadsPath, img);
       try {

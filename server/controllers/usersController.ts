@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { userRepo } from '../models/userRepo.js';
 import { authService } from '../services/authService.js';
-import { mapUser } from '../config/db.js';
 import type { UserDTO, CreateUserData, UpdateUserData } from '../types/index.js';
 
 function getParamId(req: Request): number {
@@ -10,16 +9,16 @@ function getParamId(req: Request): number {
 
 export const usersController = {
   async getUsers(req: Request, res: Response): Promise<void> {
-    const users = userRepo.findAll().map((u) => mapUser(u));
+    const users = (await userRepo.findAll()).map(userRepo.mapUser);
     res.json(users);
   },
   async getUser(req: Request, res: Response): Promise<void> {
-    const user = userRepo.findById(getParamId(req));
+    const user = await userRepo.findById(getParamId(req));
     if (!user) {
       res.status(404).json({ error: 'User not found' });
       return;
     }
-    res.json(mapUser(user));
+    res.json(userRepo.mapUser(user));
   },
   async createUser(req: Request, res: Response): Promise<void> {
     const { username, password, fullname, perm_products, perm_categories, perm_transactions, perm_users, perm_settings } = req.body || {};
@@ -27,13 +26,13 @@ export const usersController = {
       res.status(400).json({ error: 'Username and password required' });
       return;
     }
-    const existing = userRepo.findByUsername(username);
+    const existing = await userRepo.findByUsername(username);
     if (existing) {
       res.status(400).json({ error: 'Username already exists' });
       return;
     }
     const hashed = authService.hashPassword(password);
-    const user = userRepo.create({
+    const user = await userRepo.create({
       username,
       password: hashed,
       fullname: fullname || '',
@@ -47,7 +46,7 @@ export const usersController = {
   },
   async updateUser(req: Request, res: Response): Promise<void> {
     const id = getParamId(req);
-    const user = userRepo.findById(id);
+    const user = await userRepo.findById(id);
     if (!user) {
       res.status(404).json({ error: 'User not found' });
       return;
@@ -56,7 +55,7 @@ export const usersController = {
     if (password) {
       rest.password = authService.hashPassword(password);
     }
-    const updated = userRepo.update(id, rest as UpdateUserData);
+    const updated = await userRepo.update(id, rest as UpdateUserData);
     if (updated) {
       res.json(updated);
     } else {
@@ -64,11 +63,11 @@ export const usersController = {
     }
   },
   async deleteUser(req: Request, res: Response): Promise<void> {
-    userRepo.delete(getParamId(req));
+    await userRepo.delete(getParamId(req));
     res.sendStatus(200);
   },
   async logoutUser(req: Request, res: Response): Promise<void> {
-    userRepo.updateStatus(getParamId(req), 'Logged Out');
+    await userRepo.updateStatus(getParamId(req), 'Logged Out');
     res.sendStatus(200);
   },
 };

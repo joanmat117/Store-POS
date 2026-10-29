@@ -165,18 +165,18 @@
 **Why:** Keeps secrets out of source control and allows per‑environment tuning.
 
 ### 8. Introduce Drizzle ORM & Migrate from sql.js
-- [ ] Add `drizzle-orm`, `drizzle-kit`, `better-sqlite3` (or `libsql`) dependencies
-- [ ] Define schema files under `server/db/schema/` (users, products, categories, customers, settings, media_library, transactions)
-- [ ] Create `server/db/index.ts` exporting `db` instance (Drizzle + SQLite driver)
-- [ ] Write migration files with `drizzle-kit generate` and apply with `drizzle-kit migrate`
-- [ ] Replace all raw SQL in `server/routes/*` and `server/db.js` with Drizzle queries
-- [ ] Remove `sql.js` and related WASM handling
+- [x] Add `drizzle-orm`, `drizzle-kit`, `better-sqlite3` (or `libsql`) dependencies
+- [x] Define schema files under `server/db/schema/` (users, products, categories, customers, settings, media_library, transactions)
+- [x] Create `server/db/index.ts` exporting `db` instance (Drizzle + SQLite driver)
+- [x] Write migration files with `drizzle-kit generate` and apply with `drizzle-kit migrate`
+- [x] Replace all raw SQL in `server/routes/*` and `server/db.js` with Drizzle queries
+- [x] Remove `sql.js` and related WASM handling
 **Why:** Type‑safe, maintainable database layer; eliminates manual schema sync and WASM overhead.
 
 ### 9. Database Migrations System (Drizzle‑kit)
-- [ ] Configure `drizzle.config.ts` pointing to schema and migration folder
-- [ ] Add npm scripts `db:generate`, `db:migrate`, `db:push`
-- [ ] Run migrations on app startup (via `db:migrate` in `initDatabase`)
+- [x] Configure `drizzle.config.ts` pointing to schema and migration folder
+- [x] Add npm scripts `db:generate`, `db:migrate`, `db:push`
+- [x] Run migrations on app startup (via `db:migrate` in `initDatabase`)
 **Why:** Versioned, repeatable schema changes; works in CI/CD and Docker.
 
 ### 10. Docker Support

@@ -11,6 +11,9 @@ const uploadsPath = path.join(tmp, 'uploads');
 
 fs.mkdirSync(uploadsPath, { recursive: true });
 
+// Set custom database path via env var before creating server
+process.env.POS_DB_PATH = dbPath;
+
 const app = await createServer({
   dbPath,
   uploadsPath,

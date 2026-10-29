@@ -23,7 +23,7 @@ export const mediaService = {
     return mediaRepo.create(mediaData);
   },
   async deleteMedia(id: number, uploadsPath: string): Promise<{ ok: boolean }> {
-    const filename = mediaRepo.delete(id);
+    const filename = await mediaRepo.delete(id);
     if (filename) {
       const filePath = path.join(uploadsPath, filename);
       try {

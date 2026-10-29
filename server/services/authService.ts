@@ -5,10 +5,10 @@ import type { UserDTO, JWTPayload } from '../types/index.js';
 
 export const authService = {
   async login(username: string, password: string): Promise<UserDTO | null> {
-    const user = userRepo.findByUsername(username);
+    const user = await userRepo.findByUsername(username);
     if (!user) return null;
     if (!bcrypt.compareSync(password, user.password)) return null;
-    userRepo.updateStatus(user.id, `Logged In_${new Date().toISOString()}`);
+    await userRepo.updateStatus(user.id, `Logged In_${new Date().toISOString()}`);
     return userRepo.mapUser(user);
   },
   hashPassword(password: string): string {
@@ -19,7 +19,7 @@ export const authService = {
   },
   async updatePassword(userId: number, newPassword: string): Promise<{ ok: boolean }> {
     const hashed = this.hashPassword(newPassword);
-    userRepo.updatePassword(userId, hashed);
+    await userRepo.updatePassword(userId, hashed);
     return { ok: true };
   },
 };

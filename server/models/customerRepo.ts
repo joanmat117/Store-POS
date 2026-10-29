@@ -1,33 +1,58 @@
-import { getDb } from '../config/db.js';
+import { getDb } from '../db/index.js';
+import { customers } from '../db/schema/index.js';
+import { eq } from 'drizzle-orm';
 import type { CustomerRow, CustomerDTO, CustomerFormData } from '../types/index.js';
-import { mapCustomer } from '../config/db.js';
+
+function mapCustomer(row: CustomerRow | undefined): CustomerDTO | null {
+  if (!row) return null;
+  return {
+    _id: String(row.id),
+    id: row.id,
+    name: row.name,
+    phone: row.phone,
+    email: row.email,
+    address: row.address,
+  };
+}
 
 export const customerRepo = {
-  findAll(): CustomerDTO[] {
-    return (getDb().prepare('SELECT * FROM customers ORDER BY name').all() as unknown as CustomerRow[])
-      .map(mapCustomer)
-      .filter((c): c is CustomerDTO => c !== null);
+  async findAll(): Promise<CustomerDTO[]> {
+    const rows = await getDb().select().from(customers).orderBy(customers.name);
+    return rows.map(mapCustomer).filter((c): c is CustomerDTO => c !== null);
   },
-  findById(id: number): CustomerDTO | null {
-    const row = getDb().prepare('SELECT * FROM customers WHERE id = ?').get(id) as CustomerRow | undefined;
-    return mapCustomer(row);
+  async findById(id: number): Promise<CustomerDTO | null> {
+    const result = await getDb().select().from(customers).where(eq(customers.id, id)).limit(1);
+    return mapCustomer(result[0]);
   },
-  create(customerData: CustomerFormData): CustomerDTO {
-    const result = getDb()
-      .prepare(`INSERT INTO customers (name, phone, email, address) VALUES (?, ?, ?, ?)`)
-      .run(customerData.name, customerData.phone || '', customerData.email || '', customerData.address || '');
-    const customer = this.findById(result.lastInsertRowid);
+  async create(customerData: CustomerFormData): Promise<CustomerDTO> {
+    const result = await getDb()
+      .insert(customers)
+      .values({
+        name: customerData.name,
+        phone: customerData.phone || '',
+        email: customerData.email || '',
+        address: customerData.address || '',
+      })
+      .returning({ id: customers.id });
+    const customer = await this.findById(result[0].id);
     if (!customer) throw new Error('Failed to create customer');
     return customer;
   },
-  update(id: number, customerData: CustomerFormData): CustomerDTO | null {
-    getDb()
-      .prepare(`UPDATE customers SET name = ?, phone = ?, email = ?, address = ? WHERE id = ?`)
-      .run(customerData.name, customerData.phone || '', customerData.email || '', customerData.address || '', id);
+  async update(id: number, customerData: CustomerFormData): Promise<CustomerDTO | null> {
+    await getDb()
+      .update(customers)
+      .set({
+        name: customerData.name,
+        phone: customerData.phone || '',
+        email: customerData.email || '',
+        address: customerData.address || '',
+      })
+      .where(eq(customers.id, id));
     return this.findById(id);
   },
-  delete(id: number): { changes: number } {
-    return getDb().prepare('DELETE FROM customers WHERE id = ?').run(id);
+  async delete(id: number): Promise<{ changes: number }> {
+    const result = await getDb().delete(customers).where(eq(customers.id, id));
+    return { changes: result.changes ?? 0 };
   },
   mapCustomer,
 };

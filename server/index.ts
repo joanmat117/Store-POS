@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
-import { initDatabase } from './config/db.js';
 import { setJwtSecret } from './config/auth.js';
 import { logger } from './logger.js';
 import { requestLogger } from './middleware/requestLogger.js';
@@ -16,11 +15,13 @@ import customersRoutes from './routes/customersRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import mediaRoutes from './routes/mediaRoutes.js';
 import demoRoutes from './routes/demoRoutes.js';
+import { initializeDb } from './db/index.js';
 
 export async function createServer({ dbPath, uploadsPath, jwtSecret }: { dbPath: string; uploadsPath: string; jwtSecret: string }): Promise<express.Express> {
   fs.mkdirSync(uploadsPath, { recursive: true });
   fs.mkdirSync(path.join(uploadsPath, 'library'), { recursive: true });
-  await initDatabase(dbPath);
+  // Initialize database with custom path
+  initializeDb(dbPath);
   setJwtSecret(jwtSecret);
 
   const app = express();
