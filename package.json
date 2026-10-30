@@ -38,6 +38,8 @@
     "appId": "com.storepos.app",
     "productName": "Store POS",
     "copyright": "Copyright © Hosting Domain",
+    "publish": null,
+    "electronVersion": "33.4.11",
     "directories": {
       "output": "release",
       "buildResources": "build"
