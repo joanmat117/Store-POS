@@ -12,7 +12,7 @@
     "dev:backend": "node server/dev.mjs",
     "prod:web": "concurrently -k \"vite preview\" \"node server/dist/standalone.js\"",
     "build": "vite build",
-    "build:backend": "tsc -p server/tsconfig.backend.json && cp -r server/db/migrations server/dist/db/",
+    "build:backend": "tsc -p server/tsconfig.backend.json && node scripts/copy-migrations.mjs",
     "start": "electron .",
     "preview": "vite preview",
     "smoke": "node --loader ts-node/esm scripts/smoke-api.mjs && node --loader ts-node/esm scripts/smoke-lan.mjs",
@@ -38,7 +38,6 @@
     "appId": "com.storepos.app",
     "productName": "Store POS",
     "copyright": "Copyright © Hosting Domain",
-    "publish": "never",
     "directories": {
       "output": "release",
       "buildResources": "build"
