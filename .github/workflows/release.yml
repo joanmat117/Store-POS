@@ -17,6 +17,8 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+      - name: Install Python setuptools (distutils)
+        run: python -m pip install --upgrade pip setuptools
       - run: npm ci
       - run: npm run build:backend && npm run build
       - run: npm prune --production
