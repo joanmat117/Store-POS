@@ -3,10 +3,11 @@ import { app, BrowserWindow, ipcMain, screen } from 'electron';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import crypto from 'crypto';
 import os from 'os';
 import dotenv from 'dotenv';
-import { logger } from '../server/logger.js';
-import { API_PORT, getJwtSecret } from '../server/config/constants.js';
+import { logger } from '../server/dist/logger.js';
+import { API_PORT, getJwtSecret } from '../server/dist/config/constants.js';
 
 // ========== ENV SETUP - PRIMERO, ANTES DE NADA ==========
 const __filename = fileURLToPath(import.meta.url);
@@ -21,7 +22,7 @@ function ensureEnvFileExists() {
     const envPath = path.join(userDataPath, '.env');
     
     if (!fs.existsSync(envPath)) {
-      const secret = require('crypto').randomBytes(32).toString('hex');
+      const secret = crypto.randomBytes(32).toString('hex');
       const content = [
         `# Generado automáticamente en primer arranque`,
         `JWT_SECRET=${secret}`,

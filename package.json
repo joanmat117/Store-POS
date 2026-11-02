@@ -47,7 +47,7 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "server/**/*",
+      "server/dist/**/*",
       "build/icon.ico",
       "public/favicon.ico",
       "package.json"
@@ -91,7 +91,8 @@
         "libatspi2.0-0",
         "libuuid1",
         "libappindicator3-1",
-        "libsecret-1-0"
+        "libsecret-1-0",
+        "libasound2"
       ]
     },
     "nsis": {
@@ -140,12 +141,13 @@
     "@vitest/coverage-v8": "^5.0.5",
     "concurrently": "^9.1.2",
     "electron": "33.4.11",
-    "electron-builder": "25.1.8",
+    "electron-builder": "^26.18.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.7",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "node-gyp": "^13.1.0",
     "prettier": "^3.9.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",

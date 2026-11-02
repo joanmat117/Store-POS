@@ -1,8 +1,8 @@
-import { Router } from 'express';
+import { Router, type Router as ExpressRouter } from 'express';
 import { usersController } from '../controllers/usersController.js';
 import { authenticate, requirePerm } from '../middleware/auth.js';
 
-const router = Router();
+const router: ExpressRouter = Router();
 router.use(authenticate);
 router.use(requirePerm('perm_users'));
 
