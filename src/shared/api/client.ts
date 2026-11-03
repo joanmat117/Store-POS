@@ -206,7 +206,14 @@ export const api = {
 
   getProducts: () => request<Product[]>('/inventory/products'),
 
-  saveProduct: (form: FormData) => request('/inventory/product', { method: 'POST', body: form }),
+  saveProduct: (form: FormData) => {
+    const id = form.get('id');
+    const hasId = id !== null && id !== '';
+    return request('/inventory/product', {
+      method: hasId ? 'PUT' : 'POST',
+      body: form,
+    });
+  },
 
   deleteProduct: (id: number) => request(`/inventory/product/${id}`, { method: 'DELETE' }),
 

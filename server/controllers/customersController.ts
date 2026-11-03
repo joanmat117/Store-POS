@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { customerService } from '../services/customerService.js';
-import type { CustomerDTO } from '../types/index.js';
+import type { CustomerDTO, CustomerInput, CustomerUpdateInput } from '../types/index.js';
 
 function getCustomerIdParam(req: Request): number {
   return parseInt(String(req.params.customerId), 10);
@@ -20,11 +20,13 @@ export const customersController = {
     res.json(customer);
   },
   async createCustomer(req: Request, res: Response): Promise<void> {
-    const customer = await customerService.createCustomer(req.body);
+    const customerData = req.validated as CustomerInput;
+    const customer = await customerService.createCustomer(customerData);
     res.json(customer);
   },
   async updateCustomer(req: Request, res: Response): Promise<void> {
-    const customer = await customerService.updateCustomer(getCustomerIdParam(req), req.body);
+    const customerData = req.validated as CustomerUpdateInput;
+    const customer = await customerService.updateCustomer(getCustomerIdParam(req), customerData);
     res.json(customer);
   },
   async deleteCustomer(req: Request, res: Response): Promise<void> {

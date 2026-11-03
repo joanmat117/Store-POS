@@ -268,6 +268,127 @@ export interface TransactionFormData {
   id?: number;
 }
 
+// Zod-validated input types (mirror validation schemas)
+export interface LoginInput {
+  username: string;
+  password: string;
+}
+
+export interface ProductInput {
+  name: string;
+  price: number;
+  category: string;
+  quantity?: number;
+  stock?: number;
+  img?: string;
+  remove?: string;
+}
+
+export interface ProductUpdateInput extends ProductInput {
+  id?: string;
+}
+
+export interface CategoryInput {
+  name: string;
+}
+
+export interface CategoryUpdateInput extends CategoryInput {}
+
+export interface CustomerInput {
+  name: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+}
+
+export interface CustomerUpdateInput extends CustomerInput {}
+
+export interface UserCreateInput {
+  username: string;
+  password: string;
+  fullname?: string;
+  perm_products?: 0 | 1;
+  perm_categories?: 0 | 1;
+  perm_transactions?: 0 | 1;
+  perm_users?: 0 | 1;
+  perm_settings?: 0 | 1;
+  status?: string;
+}
+
+export interface UserUpdateInput {
+  username?: string;
+  password?: string;
+  fullname?: string;
+  perm_products?: 0 | 1;
+  perm_categories?: 0 | 1;
+  perm_transactions?: 0 | 1;
+  perm_users?: 0 | 1;
+  perm_settings?: 0 | 1;
+  status?: string;
+}
+
+export interface TransactionInput {
+  ref_number?: string;
+  customer?: string | number;
+  customer_name?: string;
+  status?: number;
+  user_id?: number;
+  user?: string;
+  user_name?: string;
+  till?: number;
+  discount?: number;
+  subtotal?: number;
+  tax?: number;
+  total?: number;
+  paid?: number;
+  change?: number;
+  payment_type?: number;
+  items?: CartItemDTO[];
+  date?: string;
+  _id?: number;
+  id?: number;
+}
+
+export interface TransactionUpdateInput extends Partial<TransactionInput> {}
+
+export interface DeleteTransactionInput {
+  orderId: number;
+  _id?: number;
+}
+
+export interface SettingsInput {
+  app?: string;
+  store?: string;
+  address_one?: string;
+  address_two?: string;
+  contact?: string;
+  tax?: string;
+  symbol?: string;
+  percentage?: number;
+  charge_tax?: boolean;
+  footer?: string;
+  img?: string;
+  till?: number;
+  server_ip?: string;
+  pexels_api_key?: string;
+}
+
+export interface BulkDeleteInput {
+  ids: number[];
+}
+
+export interface SkuInput {
+  skuCode: string;
+}
+
+export interface DateRangeQueryInput {
+  start: string;
+  end: string;
+  status?: number;
+  user?: number;
+  till?: number;
+}
+
 // JWT Payload
 export interface JWTPayload {
   id: number;

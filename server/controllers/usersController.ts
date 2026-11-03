@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { userRepo } from '../models/userRepo.js';
 import { authService } from '../services/authService.js';
-import type { UserDTO, CreateUserData, UpdateUserData } from '../types/index.js';
+import type { UserDTO, UserCreateInput, UserUpdateInput } from '../types/index.js';
 
 function getParamId(req: Request): number {
   return parseInt(String(req.params.id), 10);
@@ -21,11 +21,7 @@ export const usersController = {
     res.json(userRepo.mapUser(user));
   },
   async createUser(req: Request, res: Response): Promise<void> {
-    const { username, password, fullname, perm_products, perm_categories, perm_transactions, perm_users, perm_settings } = req.body || {};
-    if (!username || !password) {
-      res.status(400).json({ error: 'Username and password required' });
-      return;
-    }
+    const { username, password, fullname, perm_products, perm_categories, perm_transactions, perm_users, perm_settings } = req.validated as UserCreateInput;
     const existing = await userRepo.findByUsername(username);
     if (existing) {
       res.status(400).json({ error: 'Username already exists' });
@@ -51,11 +47,12 @@ export const usersController = {
       res.status(404).json({ error: 'User not found' });
       return;
     }
-    const { password, ...rest } = req.body || {};
-    if (password) {
-      rest.password = authService.hashPassword(password);
+    const validated = req.validated as UserUpdateInput;
+    const updateData: UserUpdateInput = { ...validated };
+    if (validated.password) {
+      updateData.password = authService.hashPassword(validated.password);
     }
-    const updated = await userRepo.update(id, rest as UpdateUserData);
+    const updated = await userRepo.update(id, updateData);
     if (updated) {
       res.json(updated);
     } else {

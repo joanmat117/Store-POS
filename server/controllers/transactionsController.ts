@@ -1,17 +1,13 @@
 import { Request, Response } from 'express';
 import { transactionService } from '../services/transactionService.js';
-import type { TransactionDTO } from '../types/index.js';
+import type { TransactionDTO, TransactionInput, TransactionUpdateInput, DeleteTransactionInput, DateRangeQueryInput } from '../types/index.js';
 
 function getTransactionIdParam(req: Request): number {
   return parseInt(String(req.params.transactionId), 10);
 }
 
 function getTransactionBodyId(req: Request): number {
-  return parseInt(String(req.body._id ?? req.body.id), 10);
-}
-
-function getDeleteOrderId(req: Request): number {
-  return parseInt(String(req.body?.orderId ?? req.body?._id), 10);
+  return parseInt(String((req.validated as TransactionUpdateInput)?._id ?? (req.validated as TransactionUpdateInput)?.id), 10);
 }
 
 export const transactionsController = {
@@ -28,18 +24,15 @@ export const transactionsController = {
     res.json(transactions);
   },
   async getTransactionsByDate(req: Request, res: Response): Promise<void> {
-    const startDate = new Date(String(req.query.start || ''));
-    const endDate = new Date(String(req.query.end || ''));
-    if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
-      res.status(400).json({ error: 'Invalid start or end date' });
-      return;
-    }
+    const { start, end, status, user, till } = req.validated as DateRangeQueryInput;
+    const startDate = new Date(start);
+    const endDate = new Date(end);
     const filters = {
       start: startDate.toISOString(),
       end: endDate.toISOString(),
-      status: parseInt(String(req.query.status), 10) || 1,
-      userId: parseInt(String(req.query.user), 10) || 0,
-      till: parseInt(String(req.query.till), 10) || 0,
+      status: status || 1,
+      userId: user || 0,
+      till: till || 0,
     };
     const transactions = await transactionService.getTransactionsByDate(filters);
     res.json(transactions);
@@ -53,15 +46,18 @@ export const transactionsController = {
     res.json(transaction);
   },
   async createTransaction(req: Request, res: Response): Promise<void> {
-    const transaction = await transactionService.createTransaction(req.body);
+    const transactionData = req.validated as TransactionInput;
+    const transaction = await transactionService.createTransaction(transactionData);
     res.json(transaction);
   },
   async updateTransaction(req: Request, res: Response): Promise<void> {
-    await transactionService.updateTransaction(getTransactionBodyId(req), req.body);
+    const transactionData = req.validated as TransactionUpdateInput;
+    await transactionService.updateTransaction(getTransactionBodyId(req), transactionData);
     res.sendStatus(200);
   },
   async deleteTransaction(req: Request, res: Response): Promise<void> {
-    await transactionService.deleteTransaction(getDeleteOrderId(req));
+    const { orderId } = req.validated as DeleteTransactionInput;
+    await transactionService.deleteTransaction(orderId);
     res.sendStatus(200);
   },
 };

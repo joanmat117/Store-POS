@@ -134,8 +134,8 @@
 **Why:** Type safety across backend; zero-runtime-overhead in production.
 
 ### 8. Add Request Validation (Zod)
-- [ ] Install `zod`
-- [ ] Create validation schemas in `server/validation/`:
+- [x] Install `zod`
+- [x] Create validation schemas in `server/validation/`:
   - `loginSchema`
   - `productSchema` (create/update)
   - `categorySchema`
@@ -143,7 +143,13 @@
   - `userSchema`
   - `transactionSchema`
   - `settingsSchema`
-- [ ] Apply middleware to all POST/PUT routes
+  - `bulkDeleteSchema`
+  - `skuSchema`
+  - `dateRangeQuerySchema`
+- [x] Apply middleware to all POST/PUT routes
+- [x] Update controllers to use `req.validated`
+- [x] Add validation input types to `server/types/index.ts`
+- [x] Verify with smoke tests and manual validation tests
 **Why:** Guarantees payload shape, reduces runtime errors and security surface.
 
 ### 9. Add Structured Logging

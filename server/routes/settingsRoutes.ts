@@ -2,6 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { settingsController } from '../controllers/settingsController.js';
 import { authenticate, requirePerm } from '../middleware/auth.js';
+import { validateBody } from '../middleware/validation.js';
+import { settingsSchema } from '../validation/index.js';
 
 export default function settingsRoutes(uploadsPath: string): Router {
   const router = Router();
@@ -17,7 +19,7 @@ export default function settingsRoutes(uploadsPath: string): Router {
   router.use((req: Request, _res: Response, next: NextFunction) => { req.uploadsPath = uploadsPath; next(); });
 
   router.get('/', (req, res) => settingsController.getSettings(req, res));
-  router.put('/', upload.single('imagename'), (req, res) => settingsController.updateSettings(req, res));
+  router.put('/', upload.single('imagename'), validateBody(settingsSchema), (req, res) => settingsController.updateSettings(req, res));
 
   return router;
 }

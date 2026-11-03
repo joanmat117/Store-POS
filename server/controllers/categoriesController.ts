@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { categoryService } from '../services/categoryService.js';
-import type { CategoryDTO } from '../types/index.js';
+import type { CategoryDTO, CategoryInput, CategoryUpdateInput } from '../types/index.js';
 
 function getCategoryIdParam(req: Request): number {
   return parseInt(String(req.params.categoryId), 10);
@@ -20,11 +20,13 @@ export const categoriesController = {
     res.json(category);
   },
   async createCategory(req: Request, res: Response): Promise<void> {
-    const category = await categoryService.createCategory(req.body.name);
+    const { name } = req.validated as CategoryInput;
+    const category = await categoryService.createCategory(name);
     res.json(category);
   },
   async updateCategory(req: Request, res: Response): Promise<void> {
-    const category = await categoryService.updateCategory(getCategoryIdParam(req), req.body.name);
+    const { name } = req.validated as CategoryUpdateInput;
+    const category = await categoryService.updateCategory(getCategoryIdParam(req), name);
     res.json(category);
   },
   async deleteCategory(req: Request, res: Response): Promise<void> {

@@ -1,19 +1,13 @@
 import { Request, Response } from 'express';
 import { inventoryService } from '../services/inventoryService.js';
-import type { ProductDTO } from '../types/index.js';
+import type { ProductDTO, ProductInput, ProductUpdateInput, SkuInput, BulkDeleteInput } from '../types/index.js';
 
 function getProductIdParam(req: Request): number {
   return parseInt(String(req.params.productId), 10);
 }
 
 function getProductBodyId(req: Request): number {
-  return parseInt(String(req.body.id), 10);
-}
-
-function getBulkIds(req: Request): number[] {
-  return (req.body?.ids || [])
-    .map((id: unknown) => parseInt(String(id), 10))
-    .filter((id: number) => Number.isFinite(id) && id > 0);
+  return parseInt(String((req.validated as ProductUpdateInput)?.id ?? req.body.id), 10);
 }
 
 export const inventoryController = {
@@ -30,15 +24,18 @@ export const inventoryController = {
     res.json(product);
   },
   async getProductBySku(req: Request, res: Response): Promise<void> {
-    const product = await inventoryService.getProductBySku(req.body?.skuCode);
+    const { skuCode } = req.validated as SkuInput;
+    const product = await inventoryService.getProductBySku(skuCode);
     res.json(product);
   },
   async createProduct(req: Request, res: Response): Promise<void> {
-    const product = await inventoryService.createProduct(req.body, req.file, req.uploadsPath!);
+    const productData = req.validated as ProductInput;
+    const product = await inventoryService.createProduct(productData, req.file, req.uploadsPath!);
     res.json(product);
   },
   async updateProduct(req: Request, res: Response): Promise<void> {
-    await inventoryService.updateProduct(getProductBodyId(req), req.body, req.file, req.uploadsPath!);
+    const productData = req.validated as ProductUpdateInput;
+    await inventoryService.updateProduct(getProductBodyId(req), productData, req.file, req.uploadsPath!);
     res.sendStatus(200);
   },
   async deleteProduct(req: Request, res: Response): Promise<void> {
@@ -46,11 +43,7 @@ export const inventoryController = {
     res.sendStatus(200);
   },
   async bulkDeleteProducts(req: Request, res: Response): Promise<void> {
-    const ids = getBulkIds(req);
-    if (!ids.length) {
-      res.status(400).json({ error: 'No product ids provided' });
-      return;
-    }
+    const { ids } = req.validated as BulkDeleteInput;
     const result = await inventoryService.bulkDeleteProducts(ids, req.uploadsPath!);
     res.json(result);
   },
