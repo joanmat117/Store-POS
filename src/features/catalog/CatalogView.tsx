@@ -63,7 +63,11 @@ export default function CatalogView({
     fd.append('quantity', form.quantity || '0');
     fd.append('stock', form.trackStock ? '1' : 'on');
     fd.append('img', form.img);
-    await api.saveProduct(fd);
+    if (form.id) {
+      await api.updateProduct(fd);
+    } else {
+      await api.saveProduct(fd);
+    }
     setForm(emptyProduct);
     await onChanged();
   };
