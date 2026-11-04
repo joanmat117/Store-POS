@@ -32,7 +32,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:services": "vitest run server/test/unit/services"
+    "test:services": "vitest run server/test/unit/services",
+    "test:e2e": "vitest run -c server/vitest.config.e2e.ts",
+    "test:e2e:watch": "vitest -c server/vitest.config.e2e.ts",
+    "test:e2e:coverage": "vitest run -c server/vitest.config.e2e.ts --coverage",
+    "test:all": "npm run test:services && npm run test:e2e"
   },
   "build": {
     "appId": "com.storepos.app",
@@ -126,6 +130,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
+    "@faker-js/faker": "^10.6.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
@@ -150,6 +155,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "node-gyp": "^13.1.0",
     "prettier": "^3.9.10",
+    "supertest": "^7.3.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.72.1",

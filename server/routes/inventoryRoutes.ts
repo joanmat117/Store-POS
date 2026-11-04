@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { inventoryController } from '../controllers/inventoryController.js';
+import { authenticate, requirePerm } from '../middleware/auth.js';
 import { validateBody } from '../middleware/validation.js';
 import { productSchema, productUpdateSchema, skuSchema, bulkDeleteSchema } from '../validation/index.js';
 
@@ -12,6 +13,8 @@ export default function inventoryRoutes(uploadsPath: string): Router {
   });
   const upload = multer({ storage });
 
+  router.use(authenticate);
+  router.use(requirePerm('perm_products'));
   router.use((req: Request, _res: Response, next: NextFunction) => { req.uploadsPath = uploadsPath; next(); });
 
   router.get('/products', (req, res) => inventoryController.getProducts(req, res));

@@ -29,12 +29,17 @@ export const inventoryService = {
   },
   async updateProduct(id: number, data: ProductFormData, file: Express.Multer.File | undefined, uploadsPath: string): Promise<ProductDTO | null> {
     let image = data.img || '';
-    if (String(data.remove) === '1' && data.img) {
-      const oldPath = path.join(uploadsPath, data.img);
-      try {
-        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
-      } catch (err) {
-        logger.error({ err, operation: 'deleteProductImage', path: oldPath }, 'Failed to delete product image');
+    // Handle remove=1 - check if we should remove existing image
+    if (String(data.remove) === '1') {
+      // If img is provided in formData, use it; otherwise fetch from DB
+      const imgToRemove = data.img || (await productRepo.findById(id))?.img;
+      if (imgToRemove) {
+        const oldPath = path.join(uploadsPath, imgToRemove);
+        try {
+          if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+        } catch (err) {
+          logger.error({ err, operation: 'deleteProductImage', path: oldPath }, 'Failed to delete product image');
+        }
       }
       if (!file) image = '';
     }

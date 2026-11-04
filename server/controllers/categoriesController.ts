@@ -21,8 +21,16 @@ export const categoriesController = {
   },
   async createCategory(req: Request, res: Response): Promise<void> {
     const { name } = req.validated as CategoryInput;
-    const category = await categoryService.createCategory(name);
-    res.json(category);
+    try {
+      const category = await categoryService.createCategory(name);
+      res.json(category);
+    } catch (err) {
+      if (err instanceof Error && err.message === 'Category name already exists') {
+        res.status(400).json({ error: 'Category name already exists' });
+        return;
+      }
+      throw err;
+    }
   },
   async updateCategory(req: Request, res: Response): Promise<void> {
     const { name } = req.validated as CategoryUpdateInput;

@@ -1,10 +1,14 @@
 import { Router } from 'express';
 import { transactionsController } from '../controllers/transactionsController.js';
+import { authenticate, requirePerm } from '../middleware/auth.js';
 import { validateBody, validateQuery } from '../middleware/validation.js';
 import { transactionSchema, transactionUpdateSchema, deleteTransactionSchema, dateRangeQuerySchema } from '../validation/index.js';
 
 export default function transactionsRoutes(): Router {
   const router = Router();
+
+  router.use(authenticate);
+  router.use(requirePerm('perm_transactions'));
 
   router.get('/all', (req, res) => transactionsController.getAllTransactions(req, res));
   router.get('/on-hold', (req, res) => transactionsController.getOnHoldTransactions(req, res));

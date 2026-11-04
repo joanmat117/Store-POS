@@ -206,11 +206,9 @@ export const api = {
 
   getProducts: () => request<Product[]>('/inventory/products'),
 
-  saveProduct: (form: FormData) =>
-    request('/inventory/product', { method: 'POST', body: form }),
+  saveProduct: (form: FormData) => request('/inventory/product', { method: 'POST', body: form }),
 
-  updateProduct: (form: FormData) =>
-    request('/inventory/product', { method: 'PUT', body: form }),
+  updateProduct: (form: FormData) => request('/inventory/product', { method: 'PUT', body: form }),
 
   deleteProduct: (id: number) => request(`/inventory/product/${id}`, { method: 'DELETE' }),
 

@@ -72,7 +72,7 @@ export const transactionRepo = {
     const rows = await getDb()
       .select()
       .from(transactions)
-      .where(and(eq(transactions.status, 0), sql`${transactions.ref_number} != ''`))
+      .where(eq(transactions.status, 0))
       .orderBy(desc(transactions.date));
     return rows.map(mapTransaction).filter((t): t is TransactionDTO => t !== null);
   },
@@ -105,8 +105,39 @@ export const transactionRepo = {
   },
   async create(transactionData: TransactionFormData): Promise<TransactionDTO> {
     let insertedId: number;
+    const items = transactionData.items || [];
     
     runInTransaction(() => {
+      // Validate stock for each item
+      for (const item of items) {
+        const product = getDb()
+          .select({ id: products.id, quantity: products.quantity, stock: products.stock })
+          .from(products)
+          .where(eq(products.id, item.id))
+          .limit(1)
+          .get();
+        if (!product || product.stock === 0 || (product.quantity ?? 0) < item.quantity) {
+          throw new Error(`Insufficient stock for product ${item.id}`);
+        }
+      }
+      
+      // Calculate subtotal from items
+      const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      // Apply discount
+      const discount = transactionData.discount || 0;
+      const discountedSubtotal = subtotal * (1 - discount / 100);
+      
+      // Tax (default 0)
+      const tax = 0;
+      
+      // Total
+      const total = discountedSubtotal + tax;
+      
+      // Change
+      const paid = transactionData.paid ?? 0;
+      const change = paid - total;
+      
       const insertResult = getDb()
         .insert(transactions)
         .values({
@@ -117,14 +148,14 @@ export const transactionRepo = {
           user_id: transactionData.user_id || 0,
           user_name: transactionData.user_name || '',
           till: transactionData.till || 1,
-          discount: transactionData.discount || 0,
-          subtotal: transactionData.subtotal || 0,
-          tax: transactionData.tax || 0,
-          total: transactionData.total ?? 0,
-          paid: transactionData.paid ?? 0,
-          change: transactionData.change || 0,
+          discount,
+          subtotal,
+          tax,
+          total,
+          paid,
+          change,
           payment_type: transactionData.payment_type || 1,
-          items_json: JSON.stringify(transactionData.items),
+          items_json: JSON.stringify(items),
           date: transactionData.date || new Date().toISOString(),
         })
         .returning({ id: transactions.id })
@@ -132,9 +163,9 @@ export const transactionRepo = {
       
       insertedId = insertResult!.id;
       
-      // Decrement inventory inside the same transaction if paid
-      if ((transactionData.paid ?? 0) >= (transactionData.total ?? 0) && (transactionData.status === 1 || transactionData.status === undefined)) {
-        decrementInventorySync(transactionData.items || []);
+      // Decrement inventory inside the same transaction if paid >= total
+      if (paid >= total && (transactionData.status === 1 || transactionData.status === undefined)) {
+        decrementInventorySync(items);
       }
     });
     
@@ -146,6 +177,26 @@ export const transactionRepo = {
     const existing = await getDb().select().from(transactions).where(eq(transactions.id, id)).limit(1);
     
     runInTransaction(() => {
+      // Determine items to use: new ones from request, or existing ones
+      const items = transactionData.items || (existing[0] ? JSON.parse(existing[0].items_json || '[]') : []);
+      
+      // Calculate subtotal from items
+      const subtotal = items.reduce((sum: number, item: CartItemDTO) => sum + (item.price * item.quantity), 0);
+      
+      // Apply discount
+      const discount = transactionData.discount || 0;
+      const discountedSubtotal = subtotal * (1 - discount / 100);
+      
+      // Tax (default 0 as per user request)
+      const tax = 0;
+      
+      // Total
+      const total = discountedSubtotal + tax;
+      
+      // Change
+      const paid = transactionData.paid ?? 0;
+      const change = paid - total;
+      
       getDb()
         .update(transactions)
         .set({
@@ -156,22 +207,22 @@ export const transactionRepo = {
           user_id: transactionData.user_id || 0,
           user_name: transactionData.user_name || '',
           till: transactionData.till || 1,
-          discount: transactionData.discount || 0,
-          subtotal: transactionData.subtotal || 0,
-          tax: transactionData.tax || 0,
-          total: transactionData.total ?? 0,
-          paid: transactionData.paid ?? 0,
-          change: transactionData.change || 0,
+          discount,
+          subtotal,
+          tax,
+          total,
+          paid,
+          change,
           payment_type: transactionData.payment_type || 1,
-          items_json: JSON.stringify(transactionData.items),
+          items_json: JSON.stringify(items),
           date: transactionData.date || new Date().toISOString(),
         })
         .where(eq(transactions.id, id))
         .run();
       
       // Decrement inventory inside the same transaction if completing a hold
-      if (existing[0] && existing[0].status === 0 && transactionData.status === 1 && (transactionData.paid ?? 0) >= (transactionData.total ?? 0)) {
-        decrementInventorySync(transactionData.items || []);
+      if (existing[0] && existing[0].status === 0 && transactionData.status === 1 && paid >= total) {
+        decrementInventorySync(items);
       }
     });
     

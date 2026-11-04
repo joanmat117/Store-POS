@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { mediaService } from '../services/mediaService.js';
 import type { MediaDTO } from '../types/index.js';
+import path from 'path';
+import fs from 'fs';
 
 function getMediaIdParam(req: Request): number {
   return parseInt(String(req.params.mediaId), 10);
@@ -17,7 +19,14 @@ export const mediaController = {
       res.status(404).json({ error: 'Media not found' });
       return;
     }
-    res.json(media);
+    // Servir el archivo real
+    const uploadsPath = req.uploadsPath!;
+    const filePath = path.join(uploadsPath, media.filename);
+    if (!fs.existsSync(filePath)) {
+      res.status(404).json({ error: 'Media file not found on disk' });
+      return;
+    }
+    res.sendFile(filePath);
   },
   async uploadMedia(req: Request, res: Response): Promise<void> {
     if (!req.file) {

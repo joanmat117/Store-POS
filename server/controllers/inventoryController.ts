@@ -35,8 +35,12 @@ export const inventoryController = {
   },
   async updateProduct(req: Request, res: Response): Promise<void> {
     const productData = req.validated as ProductUpdateInput;
-    await inventoryService.updateProduct(getProductBodyId(req), productData, req.file, req.uploadsPath!);
-    res.sendStatus(200);
+    const updated = await inventoryService.updateProduct(getProductBodyId(req), productData, req.file, req.uploadsPath!);
+    if (!updated) {
+      res.status(404).json({ error: 'Product not found' });
+      return;
+    }
+    res.json(updated);
   },
   async deleteProduct(req: Request, res: Response): Promise<void> {
     await inventoryService.deleteProduct(getProductIdParam(req), req.uploadsPath!);

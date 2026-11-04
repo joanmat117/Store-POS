@@ -21,7 +21,13 @@ export const categoryRepo = {
     const result = await getDb().select().from(categories).where(eq(categories.id, id)).limit(1);
     return mapCategory(result[0]);
   },
+  async findByName(name: string): Promise<CategoryDTO | null> {
+    const result = await getDb().select().from(categories).where(eq(categories.name, name)).limit(1);
+    return mapCategory(result[0]);
+  },
   async create(name: string): Promise<CategoryDTO> {
+    const existing = await this.findByName(name);
+    if (existing) throw new Error('Category name already exists');
     const result = await getDb().insert(categories).values({ name }).returning({ id: categories.id });
     const category = await this.findById(result[0].id);
     if (!category) throw new Error('Failed to create category');

@@ -23,7 +23,8 @@ export function requirePerm(perm: keyof JWTPayload): (req: Request, res: Respons
       res.status(401).json({ error: 'Authentication required' });
       return;
     }
-    if (req.user.id === 1 || req.user[perm]) {
+    // Permisos son 0 (sin permiso) o 1 (con permiso) - comparar explícitamente con 1
+    if (req.user.id === 1 || req.user[perm] === 1) {
       next();
       return;
     }
@@ -37,7 +38,8 @@ export function requireAnyPerm(...perms: (keyof JWTPayload)[]): (req: Request, r
       res.status(401).json({ error: 'Authentication required' });
       return;
     }
-    if (req.user.id === 1 || perms.some(p => req.user![p])) {
+    // Permisos son 0 (sin permiso) o 1 (con permiso) - comparar explícitamente con 1
+    if (req.user.id === 1 || perms.some(p => req.user![p] === 1)) {
       next();
       return;
     }

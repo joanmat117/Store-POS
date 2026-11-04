@@ -47,13 +47,25 @@ export const transactionsController = {
   },
   async createTransaction(req: Request, res: Response): Promise<void> {
     const transactionData = req.validated as TransactionInput;
-    const transaction = await transactionService.createTransaction(transactionData);
-    res.json(transaction);
+    try {
+      const transaction = await transactionService.createTransaction(transactionData);
+      res.json(transaction);
+    } catch (err) {
+      if (err instanceof Error && err.message.startsWith('Insufficient stock')) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      throw err;
+    }
   },
   async updateTransaction(req: Request, res: Response): Promise<void> {
     const transactionData = req.validated as TransactionUpdateInput;
-    await transactionService.updateTransaction(getTransactionBodyId(req), transactionData);
-    res.sendStatus(200);
+    const updated = await transactionService.updateTransaction(getTransactionBodyId(req), transactionData);
+    if (!updated) {
+      res.status(404).json({ error: 'Transaction not found' });
+      return;
+    }
+    res.json(updated);
   },
   async deleteTransaction(req: Request, res: Response): Promise<void> {
     const { orderId } = req.validated as DeleteTransactionInput;
