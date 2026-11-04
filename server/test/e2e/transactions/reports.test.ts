@@ -23,32 +23,21 @@ describe('E2E Transactions - Reports', () => {
     const product = await api.expectCreated('/api/inventory/product', productFactory({ price: 10, quantity: 100 }));
     const customer = await api.expectCreated('/api/customers', customerFactory({ name: 'Report Customer' }));
 
-    // Ventas en diferentes fechas (usando fecha actual)
-    const today = new Date().toISOString().split('T')[0];
-    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+    // Usar fecha fija para evitar flakiness
+    const fixedDate = '2025-06-15T10:00:00.000Z';
+    const startDate = '2025-06-15';
+    const endDate = '2025-06-16';
     await api.expectCreated('/api/new', transactionFactory({
       customer: String(customer.id),
       customer_name: customer.name,
       items: [{ id: product.id, name: product.name, price: 10, quantity: 1, stock: 1 }],
       payment_type: 1,
       paid: 10,
-      date: today,
+      date: fixedDate,
     }));
 
-    const report = await api.expectOk('get', `/api/by-date?start=${today}&end=${tomorrow}`);
+    const report = await api.expectOk('get', `/api/by-date?start=${startDate}&end=${endDate}`);
     expect(Array.isArray(report)).toBe(true);
     expect(report.length).toBeGreaterThanOrEqual(1);
   });
-
-  // NOTA: Los endpoints /api/transactions/report/summary y /api/transactions/report/by-payment-type
-  // NO EXISTEN en la API actual. Se mantienen como documentación de funcionalidad futura.
-  /*
-  it('GET /api/transactions/report/summary → resumen de ventas', async () => {
-    // Endpoint no implementado
-  });
-
-  it('GET /api/transactions/report/by-payment-type → desglose por tipo de pago', async () => {
-    // Endpoint no implementado
-  });
-  */
 });

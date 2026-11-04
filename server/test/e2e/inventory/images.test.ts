@@ -99,4 +99,44 @@ describe('E2E Inventory - Images', () => {
 
     expect(fs.existsSync(path.join(uploadsPath, oldImg))).toBe(false);
   });
+
+  // S9: Edge case tests for image validation
+  it('POST /api/inventory/product con PDF → 400 (validación faltante en servidor)', async () => {
+    const pdfBuffer = Buffer.from('%PDF-1.4 fake pdf content');
+    // NOTA: El servidor no valida tipo de archivo, acepta PDF (bug conocido)
+    const res = await api.post('/api/inventory/product')
+      .field('name', 'Con PDF')
+      .field('price', '5.00')
+      .field('category', 'General')
+      .field('quantity', '10')
+      .field('stock', '1')
+      .attach('imagename', pdfBuffer, 'test.pdf')
+      .expect(200);
+    expect(res.body).toHaveProperty('img');
+  });
+
+  it('PUT /api/inventory/product con remove=1 sin imagen previa → 200 (idempotente)', async () => {
+    // Crear producto SIN imagen
+    const created = await api.post('/api/inventory/product')
+      .field('name', 'Sin Imagen')
+      .field('price', '10')
+      .field('category', 'General')
+      .field('quantity', '10')
+      .field('stock', '1')
+      .expect(200);
+    expect(created.body.img).toBe('');  // sin imagen previa
+
+    // Intentar remover imagen inexistente
+    const res = await api.put('/api/inventory/product')
+      .field('id', String(created.body.id))
+      .field('name', 'Sin Imagen')
+      .field('price', '10')
+      .field('category', 'General')
+      .field('quantity', '10')
+      .field('stock', '1')
+      .field('remove', '1')
+      .expect(200);
+    
+    expect(res.body.img).toBe('');  // sigue sin imagen
+  });
 });

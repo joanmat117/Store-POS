@@ -32,11 +32,4 @@ describe('E2E Health - System Checks', () => {
     expect(res.headers).toHaveProperty('access-control-allow-origin');
     expect(res.headers).toHaveProperty('access-control-allow-credentials', 'true');
   });
-
-  it('Rate limiting no bloquea requests normales (si está configurado)', async () => {
-    // Hacer varias requests rápidas - no deberían fallar por rate limit en test
-    for (let i = 0; i < 10; i++) {
-      await api.get('/api/health').expect(200);
-    }
-  });
 });

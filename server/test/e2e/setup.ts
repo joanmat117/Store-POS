@@ -1,6 +1,8 @@
 import { beforeAll, afterAll, afterEach, vi } from 'vitest';
-import { initializeDb, getSqlite, getDb } from '../../db/index.js';
+import { initializeDb, getSqlite } from '../../db/index.js';
 import { _resetCache } from '../../config/paths.js';
+import { resetAppCache } from './helpers/app.js';
+import { clearAuthCache } from './helpers/auth.js';
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
@@ -34,13 +36,14 @@ beforeAll(async () => {
 afterAll(async () => {
   const sqlite = getSqlite();
   sqlite?.close();
-  // Limpieza opcional: fs.rmSync(testDbPath, { recursive: true, force: true });
   delete process.env.POS_DATA_DIR;
   _resetCache();
 });
 
 afterEach(() => {
   vi.clearAllMocks();
+  resetAppCache();
+  clearAuthCache();
 });
 
 // Helper global para tests

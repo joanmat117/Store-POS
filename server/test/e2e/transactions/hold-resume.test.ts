@@ -4,6 +4,7 @@ import { createApiClient } from '../helpers/request.js';
 import { seedBaseData, truncateAllTables } from '../helpers/db.js';
 import { loginAsAdmin } from '../helpers/auth.js';
 import { productFactory, transactionFactory } from '../helpers/factories.js';
+import { TransactionStatus, PaymentType } from '../helpers/constants.js';
 
 describe('E2E Transactions - Hold & Resume', () => {
   let app: Awaited<ReturnType<typeof createTestApp>>;
@@ -24,12 +25,12 @@ describe('E2E Transactions - Hold & Resume', () => {
     
     const holdSale = await api.expectCreated('/api/new', transactionFactory({
       items: [{ id: product.id, name: product.name, price: 10, quantity: 3, stock: 1 }],
-      status: 0, // hold
-      payment_type: 1,
+      status: TransactionStatus.HOLD,
+      payment_type: PaymentType.CASH,
       paid: 0,
     }));
 
-    expect(holdSale.status).toBe(0);
+    expect(holdSale.status).toBe(TransactionStatus.HOLD);
     expect(holdSale.paid).toBe(0);
   });
 
@@ -38,13 +39,13 @@ describe('E2E Transactions - Hold & Resume', () => {
     
     await api.expectCreated('/api/new', transactionFactory({
       items: [{ id: product.id, name: product.name, price: 10, quantity: 1, stock: 1 }],
-      status: 0,
+      status: TransactionStatus.HOLD,
     }));
 
     const onHold = await api.expectOk('get', '/api/on-hold');
     expect(Array.isArray(onHold)).toBe(true);
     expect(onHold.length).toBeGreaterThanOrEqual(1);
-    expect(onHold[0].status).toBe(0);
+    expect(onHold[0].status).toBe(TransactionStatus.HOLD);
   });
 
   it('PUT /api/new - reanuda hold → completa venta y descuenta stock', async () => {
@@ -52,20 +53,20 @@ describe('E2E Transactions - Hold & Resume', () => {
     
     const holdSale = await api.expectCreated('/api/new', transactionFactory({
       items: [{ id: product.id, name: product.name, price: 15, quantity: 2, stock: 1 }],
-      status: 0,
-      payment_type: 1,
+      status: TransactionStatus.HOLD,
+      payment_type: PaymentType.CASH,
       paid: 0,
     }));
 
     // Reanudar: cambiar status a 1 y pagar (id en body)
     const resumed = await api.expectOk('put', `/api/new`, {
       id: holdSale.id,
-      status: 1,
+      status: TransactionStatus.COMPLETED,
       paid: 30,
-      payment_type: 1,
+      payment_type: PaymentType.CASH,
     });
 
-    expect(resumed.status).toBe(1);
+    expect(resumed.status).toBe(TransactionStatus.COMPLETED);
     expect(resumed.paid).toBe(30);
     expect(resumed.total).toBe(30);
   });

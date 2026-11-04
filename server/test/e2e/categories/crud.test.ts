@@ -19,10 +19,20 @@ describe('E2E Categories - CRUD', () => {
 
   beforeEach(async () => { await truncateAllTables(); await seedBaseData(); });
 
-  it('GET /api/categories - lista categorías → 200 array', async () => {
+  it('GET /api/categories - lista categorías → 200 array con seed', async () => {
     const cats = await api.expectOk('get', '/api/categories');
     expect(Array.isArray(cats)).toBe(true);
     expect(cats.length).toBeGreaterThanOrEqual(1); // seed tiene 'General'
+    
+    // Verificar seed "General" existe
+    const general = cats.find((c: any) => c.name === 'General');
+    expect(general).toBeDefined();
+    expect(general).toMatchObject({ id: expect.any(Number), name: 'General' });
+    
+    // Verificar estructura de cada item
+    cats.forEach((c: any) => {
+      expect(c).toMatchObject({ id: expect.any(Number), name: expect.any(String) });
+    });
   });
 
   it('POST /api/categories - crea categoría → 201', async () => {

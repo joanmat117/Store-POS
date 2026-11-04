@@ -48,6 +48,15 @@ describe('E2E Media - Upload & Serve', () => {
     const list = await api.expectOk('get', '/api/media');
     expect(Array.isArray(list)).toBe(true);
     expect(list.length).toBeGreaterThanOrEqual(2);
+    
+    // Verificar estructura de cada item (la API devuelve _id e id, filename)
+    list.forEach((m: any) => {
+      expect(m).toMatchObject({ 
+        id: expect.any(Number), 
+        filename: expect.any(String),
+      });
+      expect(m).toHaveProperty('_id');
+    });
   });
 
   it('GET /api/media/:id - sirve archivo → 200 + image/jpeg', async () => {

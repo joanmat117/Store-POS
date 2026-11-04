@@ -19,10 +19,32 @@ describe('E2E Users - CRUD', () => {
 
   beforeEach(async () => { await truncateAllTables(); await seedBaseData(); });
 
-  it('GET /api/users - lista usuarios → 200 array', async () => {
+  it('GET /api/users - lista usuarios → 200 array con admin', async () => {
     const users = await api.expectOk('get', '/api/users');
     expect(Array.isArray(users)).toBe(true);
     expect(users.length).toBeGreaterThanOrEqual(1);
+    
+    // Verificar que admin (id=1) está en la lista
+    const admin = users.find((u: any) => u.id === 1 && u.username === 'admin');
+    expect(admin).toBeDefined();
+    expect(admin).toMatchObject({ id: 1, username: 'admin' });
+    expect(admin).not.toHaveProperty('password');
+    
+    // Verificar estructura de cada item
+    users.forEach((u: any) => {
+      expect(u).toMatchObject({ 
+        id: expect.any(Number), 
+        username: expect.any(String),
+        fullname: expect.any(String),
+        perm_products: expect.any(Number),
+        perm_categories: expect.any(Number),
+        perm_transactions: expect.any(Number),
+        perm_users: expect.any(Number),
+        perm_settings: expect.any(Number),
+        status: expect.any(String),
+      });
+      expect(u).not.toHaveProperty('password');
+    });
   });
 
   it('POST /api/users - crea usuario con permisos → 201', async () => {
@@ -52,8 +74,15 @@ describe('E2E Users - CRUD', () => {
 
   it('PUT /api/users/:id - actualiza password → 200', async () => {
     const created = await api.expectCreated('/api/users', userFactory({ username: 'pwdchg', password: 'oldpass' }));
+    
+    // Cambiar password
     const updated = await api.expectOk('put', `/api/users/${created.id}`, { password: 'newpass123' });
     expect(updated.id).toBe(created.id);
+    
+    // TODO: Verificar que el nuevo password funciona (requiere que el servidor hashee la password)
+    // const newToken = await loginAs(app, 'pwdchg', 'newpass123');
+    // api.setAuth(newToken);
+    // await api.get('/api/users').expect(200);
   });
 
   it('DELETE /api/users/:id - elimina usuario → 200', async () => {

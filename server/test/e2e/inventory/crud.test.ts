@@ -22,6 +22,19 @@ describe('E2E Inventory - CRUD', () => {
   it('GET /api/inventory/products - lista productos → 200 array', async () => {
     const res = await api.expectOk('get', '/api/inventory/products');
     expect(Array.isArray(res)).toBe(true);
+    
+    // Verificar estructura de cada item
+    res.forEach((p: any) => {
+      expect(p).toMatchObject({ 
+        id: expect.any(Number), 
+        name: expect.any(String),
+        price: expect.any(Number),
+        quantity: expect.any(Number),
+        category: expect.any(String),
+        stock: expect.any(Number),
+        img: expect.any(String),
+      });
+    });
   });
 
   it('POST /api/inventory/product - crea producto → 200', async () => {

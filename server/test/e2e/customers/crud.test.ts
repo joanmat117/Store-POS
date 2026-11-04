@@ -22,6 +22,17 @@ describe('E2E Customers - CRUD', () => {
   it('GET /api/customers - lista clientes → 200 array', async () => {
     const customers = await api.expectOk('get', '/api/customers');
     expect(Array.isArray(customers)).toBe(true);
+    
+    // Verificar estructura de cada item
+    customers.forEach((c: any) => {
+      expect(c).toMatchObject({ 
+        id: expect.any(Number), 
+        name: expect.any(String),
+        email: expect.any(String),
+        phone: expect.any(String),
+        address: expect.any(String),
+      });
+    });
   });
 
   it('POST /api/customers - crea cliente → 201', async () => {

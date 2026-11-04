@@ -6,6 +6,7 @@ import { loginAsAdmin, loginAs } from '../helpers/auth.js';
 import { userFactory } from '../helpers/factories.js';
 import { users } from '../../../db/schema/users.js';
 import { authService } from '../../../services/authService.js';
+import { Permissions, UserStatus } from '../helpers/constants.js';
 
 describe('E2E Users - Permission Matrix', () => {
   let app: Awaited<ReturnType<typeof createTestApp>>;
@@ -34,43 +35,43 @@ describe('E2E Users - Permission Matrix', () => {
       perm_transactions: perms.perm_transactions ?? 0,
       perm_users: perms.perm_users ?? 0,
       perm_settings: perms.perm_settings ?? 0,
-      status: 'Active',
+      status: UserStatus.ACTIVE,
     });
     return loginAs(app, username, 'test123');
   };
 
   it('perm_products=1 permite acceso a /api/inventory/products', async () => {
-    const token = await createUserWithPerms('invuser', { perm_products: 1 });
+    const token = await createUserWithPerms('invuser', { [Permissions.PRODUCTS]: 1 });
     api.setAuth(token);
     await api.get('/api/inventory/products').expect(200);
   });
 
   it('perm_products=0 deniega acceso a /api/inventory/products → 403', async () => {
-    const token = await createUserWithPerms('noinv', { perm_products: 0 });
+    const token = await createUserWithPerms('noinv', { [Permissions.PRODUCTS]: 0 });
     api.setAuth(token);
     await api.get('/api/inventory/products').expect(403);
   });
 
   it('perm_categories=1 permite acceso a /api/categories', async () => {
-    const token = await createUserWithPerms('catuser', { perm_categories: 1 });
+    const token = await createUserWithPerms('catuser', { [Permissions.CATEGORIES]: 1 });
     api.setAuth(token);
     await api.get('/api/categories').expect(200);
   });
 
   it('perm_transactions=1 permite acceso a /api/all', async () => {
-    const token = await createUserWithPerms('txnuser', { perm_transactions: 1 });
+    const token = await createUserWithPerms('txnuser', { [Permissions.TRANSACTIONS]: 1 });
     api.setAuth(token);
     await api.get('/api/all').expect(200);
   });
 
   it('perm_users=1 permite acceso a /api/users', async () => {
-    const token = await createUserWithPerms('usruser', { perm_users: 1 });
+    const token = await createUserWithPerms('usruser', { [Permissions.USERS]: 1 });
     api.setAuth(token);
     await api.get('/api/users').expect(200);
   });
 
   it('perm_settings=1 permite acceso a /api/settings', async () => {
-    const token = await createUserWithPerms('setuser', { perm_settings: 1 });
+    const token = await createUserWithPerms('setuser', { [Permissions.SETTINGS]: 1 });
     api.setAuth(token);
     await api.get('/api/settings').expect(200);
   });

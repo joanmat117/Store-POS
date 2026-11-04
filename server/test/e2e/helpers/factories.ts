@@ -39,6 +39,7 @@ export const customerFactory = (overrides: Partial<{
 export const transactionFactory = (overrides: Partial<{
   customer: string; customer_name: string; items: any[];
   payment_type: number; discount: number; status: number; paid: number;
+  date: string;
 }> = {}) => ({
   customer: overrides.customer ?? '1',
   customer_name: overrides.customer_name ?? 'Walk-in Customer',
@@ -47,4 +48,5 @@ export const transactionFactory = (overrides: Partial<{
   discount: overrides.discount ?? 0,
   status: overrides.status ?? 1, // 1=completed, 0=hold, 2=void
   paid: overrides.paid ?? 0,
+  date: overrides.date,
 });
