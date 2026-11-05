@@ -146,14 +146,18 @@ export default function CatalogView({
 
   const saveCategory = async () => {
     if (!catName.trim()) return;
-    if (editCatId) {
-      await api.updateCategory({ id: editCatId, name: catName.trim() });
-    } else {
-      await api.saveCategory({ name: catName.trim() });
+    try {
+      if (editCatId) {
+        await api.updateCategory({ id: editCatId, name: catName.trim() });
+      } else {
+        await api.saveCategory({ name: catName.trim() });
+      }
+      setCatName('');
+      setEditCatId(null);
+      await onChanged();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save category');
     }
-    setCatName('');
-    setEditCatId(null);
-    await onChanged();
   };
 
   const removeCategory = async (id: number) => {
