@@ -10,7 +10,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider,
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
@@ -64,39 +63,37 @@ export function SidebarNav({ view, onNavigate, logo }: SidebarNavProps) {
 
   return (
     <>
-      <SidebarProvider defaultOpen={true}>
-        <Sidebar side="left" variant="sidebar" collapsible="offcanvas">
-          <SidebarHeader>
-            <div className="flex items-center gap-3 px-2 py-3">
-              {logoSrc ? (
-                <img
-                  className="h-10 w-10 rounded-lg object-cover border border-sidebar-border"
-                  src={logoSrc}
-                  alt=""
-                />
-              ) : (
-                <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-sidebar-accent">
-                  <LayoutDashboard className="h-5 w-5 text-sidebar-accent-foreground" />
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <strong className="truncate block text-sidebar-foreground">
-                  Store POS
-                </strong>
-                <span className="text-xs text-sidebar-foreground/70 truncate block">
-                  {apiInfo?.mode?.replace(' Point of Sale', '') || 'Standalone'}
-                </span>
+      <Sidebar side="left" variant="sidebar" collapsible="offcanvas">
+        <SidebarHeader>
+          <div className="flex items-center gap-3 px-2 py-3">
+            {logoSrc ? (
+              <img
+                className="h-10 w-10 rounded-lg object-cover border border-sidebar-border"
+                src={logoSrc}
+                alt=""
+              />
+            ) : (
+              <div className="h-10 w-10 rounded-lg flex items-center justify-center bg-sidebar-accent">
+                <LayoutDashboard className="h-5 w-5 text-sidebar-accent-foreground" />
               </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <strong className="truncate block text-sidebar-foreground">
+                Store POS
+              </strong>
+              <span className="text-xs text-sidebar-foreground/70 truncate block">
+                {apiInfo?.mode?.replace(' Point of Sale', '') || 'Standalone'}
+              </span>
             </div>
-            <SidebarSeparator />
-          </SidebarHeader>
+          </div>
+          <SidebarSeparator />
+        </SidebarHeader>
 
-          <SidebarContent>
-            <SidebarMenu>
+        <SidebarContent>
+<SidebarMenu>
               {filteredItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
-                    asChild
                     isActive={view === item.id}
                     tooltip={state === 'collapsed' ? item.label : undefined}
                     onClick={() => {
@@ -110,55 +107,52 @@ export function SidebarNav({ view, onNavigate, logo }: SidebarNavProps) {
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
-          </SidebarContent>
+        </SidebarContent>
 
-          <SidebarFooter>
-            <SidebarSeparator />
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  tooltip={state === 'collapsed' ? 'Sign out' : undefined}
-                  onClick={() => {
-                    logout();
-                    if (isMobile) setOpenMobile(false);
-                  }}
-                >
-                  <LogOut className="h-4 w-4" aria-hidden="true" />
-                  <span>Sign out</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  tooltip={state === 'collapsed' ? 'Quit' : undefined}
-                  onClick={() => {
-                    getPosBridge().quit();
-                  }}
-                >
-                  <Power className="h-4 w-4" aria-hidden="true" />
-                  <span>Quit</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-            <div className="px-2 py-2 border-t border-sidebar-border">
-              <div className="text-sm font-medium text-sidebar-foreground truncate">
-                {user?.fullname}
-              </div>
-              <div className="text-xs text-sidebar-foreground/70">
-                Till #{apiInfo?.till || 1}
-              </div>
+        <SidebarFooter>
+          <SidebarSeparator />
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip={state === 'collapsed' ? 'Sign out' : undefined}
+                onClick={() => {
+                  logout();
+                  if (isMobile) setOpenMobile(false);
+                }}
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                <span>Sign out</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip={state === 'collapsed' ? 'Quit' : undefined}
+                onClick={() => {
+                  getPosBridge().quit();
+                }}
+              >
+                <Power className="h-4 w-4" aria-hidden="true" />
+                <span>Quit</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+          <div className="px-2 py-2 border-t border-sidebar-border">
+            <div className="text-sm font-medium text-sidebar-foreground truncate">
+              {user?.fullname}
             </div>
-          </SidebarFooter>
-        </Sidebar>
+            <div className="text-xs text-sidebar-foreground/70">
+              Till #{apiInfo?.till || 1}
+            </div>
+          </div>
+        </SidebarFooter>
+      </Sidebar>
 
-        {isMobile && (
-          <SidebarTrigger
-            className="fixed bottom-4 right-4 z-50 md:hidden"
-            aria-label="Toggle sidebar"
-          />
-        )}
-      </SidebarProvider>
+      {isMobile && (
+        <SidebarTrigger
+          className="fixed bottom-4 right-4 z-50 md:hidden"
+          aria-label="Toggle sidebar"
+        />
+      )}
     </>
   );
 }
