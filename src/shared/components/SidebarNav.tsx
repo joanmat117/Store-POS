@@ -10,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,
@@ -89,23 +90,27 @@ export function SidebarNav({ view, onNavigate, logo }: SidebarNavProps) {
           <SidebarSeparator />
         </SidebarHeader>
 
-        <SidebarContent>
-<SidebarMenu>
-              {filteredItems.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    isActive={view === item.id}
-                    tooltip={state === 'collapsed' ? item.label : undefined}
-                    onClick={() => {
-                      onNavigate(item.id);
-                      if (isMobile) setOpenMobile(false);
-                    }}
-                  >
-                    <item.icon className="h-4 w-4" aria-hidden="true" />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+<SidebarContent>
+            <SidebarMenu>
+              {filteredItems.map((item) => {
+                const isActive = view === item.id;
+                return (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      isActive={isActive}
+                      variant={isActive ? 'primary' : 'default'}
+                      tooltip={state === 'collapsed' ? item.label : undefined}
+                      onClick={() => {
+                        onNavigate(item.id);
+                        if (isMobile) setOpenMobile(false);
+                      }}
+                    >
+                      <item.icon className="h-4 w-4" aria-hidden="true" />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
         </SidebarContent>
 
@@ -146,6 +151,8 @@ export function SidebarNav({ view, onNavigate, logo }: SidebarNavProps) {
           </div>
         </SidebarFooter>
       </Sidebar>
+
+      <SidebarRail />
 
       {isMobile && (
         <SidebarTrigger
