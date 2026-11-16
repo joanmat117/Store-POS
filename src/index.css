@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --bg: #f0f3f6;
   --surface: #ffffff;
@@ -15,6 +19,16 @@
   --mono: 'Cascadia Mono', 'Consolas', monospace;
   --nav-w: 220px;
   --radius: 10px;
+
+  /* shadcn/ui sidebar variables */
+  --sidebar-background: var(--surface);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--accent-soft);
+  --sidebar-accent-foreground: var(--accent-dark);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--accent);
 }
 
 * {

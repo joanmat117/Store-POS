@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getPosBridge } from '../../bridge';
-import { getUploadsBase } from '../api/client';
+import { SidebarNav } from './SidebarNav';
+import { SidebarInset, SidebarTrigger } from '@/shared/components/ui/sidebar';
 
 export type NavView = 'till' | 'catalog' | 'sales' | 'customers' | 'team' | 'settings';
 
@@ -24,72 +24,25 @@ export default function AppShell({
   todaySales,
   logo,
 }: Props) {
-  const { user, logout, hasPerm, apiInfo } = useAuth();
-  const logoSrc = logo ? `${getUploadsBase()}/${logo}` : '';
-
-  const items: { id: NavView; label: string; show: boolean }[] = [
-    { id: 'till', label: 'Till', show: true },
-    {
-      id: 'catalog',
-      label: 'Catalog',
-      show: hasPerm('perm_products') || hasPerm('perm_categories'),
-    },
-    { id: 'sales', label: 'Sales', show: hasPerm('perm_transactions') },
-    { id: 'customers', label: 'Customers', show: true },
-    { id: 'team', label: 'Team', show: hasPerm('perm_users') },
-    { id: 'settings', label: 'Settings', show: hasPerm('perm_settings') },
-  ];
+  const { apiInfo } = useAuth();
 
   return (
-    <div className="app">
-      <aside className="nav">
-        <div className="nav-brand">
-          <div className="nav-brand-row">
-            {logoSrc ? (
-              <img className="nav-logo" src={logoSrc} alt="" />
-            ) : (
-              <div className="nav-logo nav-logo-fallback" aria-hidden />
-            )}
-            <div className="nav-brand-text">
-              <strong>Store POS</strong>
-              <span>{apiInfo?.mode?.replace(' Point of Sale', '') || 'Standalone'}</span>
-            </div>
-          </div>
-        </div>
-        {items
-          .filter((i) => i.show)
-          .map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={`nav-btn ${view === item.id ? 'active' : ''}`}
-              onClick={() => onNavigate(item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
-        <div className="nav-spacer" />
-        <button type="button" className="nav-btn" onClick={() => logout()}>
-          Sign out
-        </button>
-        <button type="button" className="nav-btn" onClick={() => getPosBridge().quit()}>
-          Quit
-        </button>
-        <div className="nav-meta">
-          <div>{user?.fullname}</div>
-          <div>Till #{apiInfo?.till || 1}</div>
-        </div>
-      </aside>
+    <div className="group/sidebar-wrapper flex min-h-svh w-full">
+      <SidebarNav view={view} onNavigate={onNavigate} logo={logo} />
 
-      <div className="workspace">
+      <SidebarInset>
         <header className="topbar">
+          <SidebarTrigger className="md:hidden" />
           <h1>{title}</h1>
           {stats}
           <div className="spacer" />
           {todaySales != null && <div className="stat-pill">Today {todaySales}</div>}
+          <div className="ml-auto flex items-center gap-2 text-xs text-muted">
+            <span>Till #{apiInfo?.till || 1}</span>
+          </div>
         </header>
         <main className="main">{children}</main>
-      </div>
+      </SidebarInset>
     </div>
   );
 }
