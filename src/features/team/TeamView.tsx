@@ -36,6 +36,10 @@ function UsersPanel() {
       setError('Password is required for new users');
       return;
     }
+    if (!form.id && form.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
     // Don't send id in body; use URL param for update
     const { id, ...body } = form;
     try {
