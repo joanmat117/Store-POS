@@ -36,8 +36,14 @@ function UsersPanel() {
       setError('Password is required for new users');
       return;
     }
+    // Don't send id in body; use URL param for update
+    const { id, ...body } = form;
     try {
-      await api.saveUser({ ...form });
+      if (id) {
+        await api.updateUser(Number(id), body);
+      } else {
+        await api.saveUser(body);
+      }
       await load();
       setForm({
         id: '',

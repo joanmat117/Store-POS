@@ -202,6 +202,9 @@ export const api = {
   saveUser: (body: Record<string, unknown>) =>
     request('/users', { method: 'POST', body: JSON.stringify(body) }),
 
+  updateUser: (id: number, body: Record<string, unknown>) =>
+    request(`/users/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+
   deleteUser: (id: number) => request(`/users/${id}`, { method: 'DELETE' }),
 
   getProducts: () => request<Product[]>('/inventory/products'),
