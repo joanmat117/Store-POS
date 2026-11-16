@@ -32,6 +32,10 @@ function UsersPanel() {
       setError('Username and full name are required');
       return;
     }
+    if (form.username.trim().length < 3) {
+      setError('Username must be at least 3 characters');
+      return;
+    }
     if (!form.id && !form.password) {
       setError('Password is required for new users');
       return;

@@ -199,6 +199,17 @@ export default function TillView({
 
   const holdSale = async () => {
     if (!cart.length) return;
+    // Validate all items have quantity > 0 (backend requires positive integer)
+    const invalidItem = cart.find((i) => !Number.isInteger(i.quantity) || i.quantity <= 0);
+    if (invalidItem) {
+      setError(`Invalid quantity for ${invalidItem.name}`);
+      return;
+    }
+    // Validate payment_type is 1, 2, or 3 (backend enum) - using default 1 for holds
+    if (![1, 2, 3].includes(paymentType)) {
+      setError('Invalid payment method');
+      return;
+    }
     try {
       const body = buildTransaction(0, 0, 0);
       if (activeHoldId) {
@@ -232,6 +243,21 @@ export default function TillView({
   };
 
   const completeSale = async () => {
+    if (!cart.length) {
+      setError('Cart is empty');
+      return;
+    }
+    // Validate all items have quantity > 0 (backend requires positive integer)
+    const invalidItem = cart.find((i) => !Number.isInteger(i.quantity) || i.quantity <= 0);
+    if (invalidItem) {
+      setError(`Invalid quantity for ${invalidItem.name}`);
+      return;
+    }
+    // Validate payment_type is 1, 2, or 3 (backend enum)
+    if (![1, 2, 3].includes(paymentType)) {
+      setError('Invalid payment method');
+      return;
+    }
     const paidNum = parseFloat(paid) || 0;
     if (paidNum + 0.0001 < total) {
       setError('Amount tendered is less than total');

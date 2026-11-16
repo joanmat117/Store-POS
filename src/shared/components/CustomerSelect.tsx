@@ -20,6 +20,7 @@ export default function CustomerSelect({ customers, value, onChange, onCustomers
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
+  const [newEmail, setNewEmail] = useState('');
 
   const list = useMemo(() => {
     return customers.filter((c) => c.name !== 'Walk-in Customer');
@@ -81,13 +82,18 @@ export default function CustomerSelect({ customers, value, onChange, onCustomers
       setError('Name is required');
       return;
     }
+    const email = newEmail.trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Invalid email format');
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
       await api.saveCustomer({
         name: newName.trim(),
         phone: newPhone.trim(),
-        email: '',
+        email,
         address: '',
       });
       await onCustomersChanged?.();
@@ -96,6 +102,7 @@ export default function CustomerSelect({ customers, value, onChange, onCustomers
         refreshed.filter((c) => c.name === newName.trim()).sort((a, b) => b.id - a.id)[0] || null;
       setNewName('');
       setNewPhone('');
+      setNewEmail('');
       setShowQuickAdd(false);
       if (created) pick(String(created.id));
       else {
@@ -199,6 +206,11 @@ export default function CustomerSelect({ customers, value, onChange, onCustomers
                 onChange={(e) => setNewPhone(e.target.value)}
                 placeholder="Phone (optional)"
               />
+              <input
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="Email (optional)"
+              />
               <div style={{ display: 'flex', gap: '0.4rem' }}>
                 <button
                   type="button"
@@ -215,6 +227,7 @@ export default function CustomerSelect({ customers, value, onChange, onCustomers
                   onClick={() => {
                     setShowQuickAdd(false);
                     setError(null);
+                    setNewEmail('');
                   }}
                 >
                   Cancel

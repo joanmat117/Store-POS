@@ -65,6 +65,20 @@ export default function SettingsView({ settings, onSaved }: Props) {
   const save = async () => {
     setError(null);
     setMessage(null);
+    // Validate percentage 0-100 (backend requires min 0, max 100)
+    if (form.charge_tax) {
+      const pct = parseFloat(form.percentage);
+      if (isNaN(pct) || pct < 0 || pct > 100) {
+        setError('Tax percentage must be between 0 and 100');
+        return;
+      }
+    }
+    // Validate till >= 1 (backend requires min 1)
+    const tillNum = parseInt(form.till, 10);
+    if (isNaN(tillNum) || tillNum < 1) {
+      setError('Till number must be 1 or greater');
+      return;
+    }
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => {

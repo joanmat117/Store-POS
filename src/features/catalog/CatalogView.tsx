@@ -54,12 +54,28 @@ export default function CatalogView({
       setError('Name is required');
       return;
     }
+    const price = parseFloat(form.price);
+    if (isNaN(price) || price <= 0) {
+      setError('Price must be greater than 0');
+      return;
+    }
+    if (!form.category.trim()) {
+      setError('Category is required');
+      return;
+    }
+    if (form.trackStock) {
+      const qty = parseInt(form.quantity, 10);
+      if (isNaN(qty) || qty < 0) {
+        setError('Quantity must be 0 or greater');
+        return;
+      }
+    }
     setError(null);
     const fd = new FormData();
     fd.append('id', form.id);
     fd.append('name', form.name.trim());
-    fd.append('price', form.price || '0');
-    fd.append('category', form.category);
+    fd.append('price', String(price));
+    fd.append('category', form.category.trim());
     fd.append('quantity', form.quantity || '0');
     fd.append('stock', form.trackStock ? '1' : 'on');
     fd.append('img', form.img);
@@ -146,6 +162,10 @@ export default function CatalogView({
 
   const saveCategory = async () => {
     if (!catName.trim()) return;
+    if (catName.trim().length > 100) {
+      setError('Category name must be 100 characters or less');
+      return;
+    }
     try {
       if (editCatId) {
         await api.updateCategory({ id: editCatId, name: catName.trim() });
