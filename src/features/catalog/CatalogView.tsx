@@ -77,7 +77,7 @@ export default function CatalogView({
     fd.append('price', String(price));
     fd.append('category', form.category.trim());
     fd.append('quantity', form.quantity || '0');
-    fd.append('stock', form.trackStock ? '1' : 'on');
+    fd.append('stock', form.trackStock ? '1' : '0');
     fd.append('img', form.img);
     if (form.id) {
       await api.updateProduct(fd);
