@@ -4,7 +4,7 @@
   "rsc": false,
   "tsx": true,
   "tailwind": {
-    "config": "tailwind.config.js",
+    "config": "",
     "css": "src/index.css",
     "baseColor": "slate",
     "cssVariables": true,
@@ -13,5 +13,8 @@
   "aliases": {
     "components": "@/shared/components",
     "utils": "@/shared/lib/utils"
+  },
+  "registries": {
+    "@acme": "https://acme.com/r/{name}.json"
   }
 }

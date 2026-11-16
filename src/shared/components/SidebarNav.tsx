@@ -44,13 +44,13 @@ const NAV_ITEMS: {
   icon: React.ComponentType<{ className?: string }>;
   perm?: 'perm_products' | 'perm_categories' | 'perm_transactions' | 'perm_users' | 'perm_settings';
 }[] = [
-  { id: 'till', label: 'Till', icon: CreditCard },
-  { id: 'catalog', label: 'Catalog', icon: Box, perm: 'perm_products' },
-  { id: 'sales', label: 'Sales', icon: Receipt, perm: 'perm_transactions' },
-  { id: 'customers', label: 'Customers', icon: Users },
-  { id: 'team', label: 'Team', icon: Users2, perm: 'perm_users' },
-  { id: 'settings', label: 'Settings', icon: Settings, perm: 'perm_settings' },
-];
+    { id: 'till', label: 'Till', icon: CreditCard },
+    { id: 'catalog', label: 'Catalog', icon: Box, perm: 'perm_products' },
+    { id: 'sales', label: 'Sales', icon: Receipt, perm: 'perm_transactions' },
+    { id: 'customers', label: 'Customers', icon: Users },
+    { id: 'team', label: 'Team', icon: Users2, perm: 'perm_users' },
+    { id: 'settings', label: 'Settings', icon: Settings, perm: 'perm_settings' },
+  ];
 
 export function SidebarNav({ view, onNavigate, logo }: SidebarNavProps) {
   const { user, logout, hasPerm, apiInfo } = useAuth();
@@ -90,13 +90,13 @@ export function SidebarNav({ view, onNavigate, logo }: SidebarNavProps) {
           <SidebarSeparator />
         </SidebarHeader>
 
-<SidebarContent>
-            <SidebarMenu>
-              {filteredItems.map((item) => {
-                const isActive = view === item.id;
-                return (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
+        <SidebarContent>
+          <SidebarMenu>
+            {filteredItems.map((item) => {
+              const isActive = view === item.id;
+              return (
+                <SidebarMenuItem key={item.id}>
+<SidebarMenuButton
                       isActive={isActive}
                       variant={isActive ? 'primary' : 'default'}
                       tooltip={state === 'collapsed' ? item.label : undefined}
@@ -105,13 +105,13 @@ export function SidebarNav({ view, onNavigate, logo }: SidebarNavProps) {
                         if (isMobile) setOpenMobile(false);
                       }}
                     >
-                      <item.icon className="h-4 w-4" aria-hidden="true" />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
+                    <item.icon className="h-4 w-4" aria-hidden="true" />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
         </SidebarContent>
 
         <SidebarFooter>

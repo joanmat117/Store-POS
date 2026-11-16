@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { SidebarNav } from './SidebarNav';
-import { SidebarInset, SidebarTrigger } from '@/shared/components/ui/sidebar';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared/components/ui/sidebar';
 
 export type NavView = 'till' | 'catalog' | 'sales' | 'customers' | 'team' | 'settings';
 
@@ -27,22 +27,24 @@ export default function AppShell({
   const { apiInfo } = useAuth();
 
   return (
-    <div className="group/sidebar-wrapper flex min-h-svh w-full">
-      <SidebarNav view={view} onNavigate={onNavigate} logo={logo} />
+    <SidebarProvider defaultOpen={true}>
+      <div className="group/sidebar-wrapper flex min-h-svh w-full">
+        <SidebarNav view={view} onNavigate={onNavigate} logo={logo} />
 
-      <SidebarInset>
-        <header className="topbar">
-          <SidebarTrigger className="md:hidden" />
-          <h1>{title}</h1>
-          {stats}
-          <div className="spacer" />
-          {todaySales != null && <div className="stat-pill">Today {todaySales}</div>}
-          <div className="ml-auto flex items-center gap-2 text-xs text-muted">
-            <span>Till #{apiInfo?.till || 1}</span>
-          </div>
-        </header>
-        <main className="main">{children}</main>
-      </SidebarInset>
-    </div>
+        <SidebarInset>
+          <header className="topbar">
+            <SidebarTrigger className="md:hidden" />
+            <h1>{title}</h1>
+            {stats}
+            <div className="spacer" />
+            {todaySales != null && <div className="stat-pill">Today {todaySales}</div>}
+            <div className="ml-auto flex items-center gap-2 text-xs text-muted">
+              <span>Till #{apiInfo?.till || 1}</span>
+            </div>
+          </header>
+          <main className="main">{children}</main>
+        </SidebarInset>
+      </div>
+    </SidebarProvider>
   );
 }
